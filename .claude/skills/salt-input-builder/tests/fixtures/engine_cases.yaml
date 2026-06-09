@@ -1,0 +1,61 @@
+# Known-good / known-bad cases for the generic engine. Add a case here before
+# trusting any new decoder or range. The harness builds a one-row sheet from each
+# case, runs profile_engine.run_checks, and compares the findings to `expect`.
+# `expect: []` means the check must stay silent (a guard against false positives).
+
+- name: "tolerance +-10% is not read as the metric (false-positive guard)"
+  profile:
+    percent_guard: true
+    metric_ranges:
+      rpm: {keywords: ["rpm", "fan speed"], lo: 100, hi: 4000}
+  roles: {title: 1, spec_start: 4, spec_end: 6, sku: 16}
+  labels: {"6": "Fan speed (RPM)"}
+  row: {1: "Test fan", 6: "Up to 2000 RPM (+-10%)", 16: "X-1"}
+  expect: []
+
+- name: "a genuinely out-of-range value is flagged SOFT"
+  profile:
+    percent_guard: true
+    metric_ranges:
+      rpm: {keywords: ["rpm", "fan speed"], lo: 100, hi: 4000}
+  roles: {title: 1, spec_start: 4, spec_end: 6, sku: 16}
+  labels: {"6": "Fan speed (RPM)"}
+  row: {1: "Test fan", 6: "9000 RPM", 16: "X-1"}
+  expect:
+    - {sev: SOFT, contains: "outside plausible"}
+
+- name: "suffix-colour contradiction is flagged HARD"
+  profile:
+    decoders:
+      - name: sc140
+        sku_regex: '3MSC14(?P<blade>FA|RA)\d\.(?P<suffix>000\d)'
+        colour_source: suffix
+        suffix_colour: {"0001": black, "0002": white}
+  roles: {title: 1, spec_start: 4, spec_end: 6, sku: 16}
+  labels: {"5": "Product colour"}
+  row: {1: "SC140", 5: "black", 16: "3MSC14FA1.0002"}
+  expect:
+    - {sev: HARD, contains: "suffix means white"}
+
+- name: "suffix-colour agreement stays silent"
+  profile:
+    decoders:
+      - name: sc140
+        sku_regex: '3MSC14(?P<blade>FA|RA)\d\.(?P<suffix>000\d)'
+        colour_source: suffix
+        suffix_colour: {"0001": black, "0002": white}
+  roles: {title: 1, spec_start: 4, spec_end: 6, sku: 16}
+  labels: {"5": "Product colour"}
+  row: {1: "SC140", 5: "white", 16: "3MSC14FA1.0002"}
+  expect: []
+
+- name: "letter-source colour is NOT suffix-checked (MHP trap guard)"
+  profile:
+    decoders:
+      - name: mhp
+        sku_regex: '3MMHP12(?P<variant>[WA])(?P<pack>\d)\.000\d'
+        colour_source: letter
+  roles: {title: 1, spec_start: 4, spec_end: 6, sku: 16}
+  labels: {"5": "Product colour"}
+  row: {1: "MHP", 5: "white", 16: "3MMHP12A3.0001"}
+  expect: []

@@ -1,0 +1,63 @@
+# EXAMPLE category profile - Cougar 120mm fans.
+#
+# THIS IS AN EXAMPLE, NOT A DEFAULT. The skill ships with NO baked-in brand or
+# category knowledge. A profile like this is BUILT per job by inspecting the
+# actual product and category data, proposed to the user, confirmed, and saved.
+# It is reused on a later batch only when a product genuinely matches it
+# (same category, same identifier scheme). A different category or brand gets
+# its own profile. See references/category-profiles.md.
+#
+# The generic engine (scripts/profile_engine.py) runs whatever profile it is
+# given. The keys below are the whole contract.
+
+category: "fans"
+brand: "Cougar"
+
+percent_guard: true
+
+# Plausibility per metric. Columns are matched by a keyword in the header label,
+# so this works regardless of which column the metric lands in.
+metric_ranges:
+  rpm:   {keywords: ["rpm", "fan speed", "speed"], lo: 100, hi: 4000}
+  cfm:   {keywords: ["cfm", "air flow", "airflow"], lo: 5,   hi: 400}
+  noise: {keywords: ["noise", "dba", "db(a)"],      lo: 5,   hi: 70}
+
+# Identifier decoders. INFERRED from the observed SKUs and attributes during
+# inspection, then confirmed - not assumed. colour_source records whether colour
+# is in the suffix or in a body letter (the MHP case, where a suffix rule would
+# be wrong), so the engine never misreads it.
+decoders:
+  - name: cougar_sc140
+    sku_regex: '3MSC14(?P<blade>FA|RA)\d\.(?P<suffix>000\d)'
+    blade_map: {FA: forward, RA: reverse}
+    colour_source: suffix
+    suffix_colour: {"0001": black, "0002": white}
+  - name: cougar_unity
+    sku_regex: '3MUN(?P<size>24|36)(?P<blade>FA|RA)\d\.(?P<suffix>000\d)'
+    blade_map: {FA: forward, RA: reverse}
+    colour_source: suffix
+    suffix_colour: {"0001": black, "0002": white}
+    set_map: {"24": ["240", "2"], "36": ["360", "3"]}
+    fancount_label_keywords: ["quantity", "pack", "in the box"]
+  - name: cougar_mhp
+    sku_regex: '3MMHP12(?P<variant>[WA])(?P<pack>\d)\.000\d'
+    colour_source: letter        # colour is the W/A letter, NOT the suffix
+    pack_map: {"1": "1", "3": "3"}
+  - name: cougar_apolar
+    sku_regex: '3MAPR12A(?P<pack>\d)\.(?P<suffix>000\d)'
+    colour_source: suffix
+    suffix_colour: {"0001": black, "0002": white}
+    pack_map: {"1": "1", "3": "3"}
+
+# Cross-field examples for OTHER categories (shown for reference; a fans profile
+# would not use these):
+#   AIO coolers - radiator size implies fan count:
+# implies_count:
+#   from_keywords: ["radiator", "row size", "size"]
+#   count_keywords: ["fan quantity", "fans", "in the box"]
+#   map: {"240": 2, "280": 2, "360": 3, "420": 3}
+#   Motherboards - socket implies chipset family:
+# compatibility:
+#   a_keywords: ["socket"]
+#   b_keywords: ["chipset"]
+#   map: {AM5: ["A620","B650","B850","X670","X870"], AM4: ["A520","B550","X570"]}

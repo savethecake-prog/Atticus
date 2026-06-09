@@ -1,0 +1,273 @@
+{
+  "retailer": "takealot",
+  "source_files": {
+    "edit_request": "Edit_Request_Template_Aug_2018.xlsx",
+    "loadsheet_105": "loadsheet-105_computer-components.xlsm",
+    "loadsheet_120": "loadsheet-120_gaming.xlsm"
+  },
+  "note": "Live template is the source of truth at export time; this spec captures the STABLE contract + how to read rules. Full attribute columns + all validations are read from the user-provided template at run time, never baked here (templates change).",
+  "edit_request": {
+    "data_sheet": "Template (Fill this in)",
+    "header_row": 3,
+    "desc_row": 4,
+    "data_start_row": 5,
+    "required": [
+      "TSIN"
+    ],
+    "blank_means_keep_existing": true,
+    "max_rows": 250,
+    "columns": {
+      "1": "Product Page URL",
+      "2": "TSIN",
+      "3": "Main Category",
+      "4": "Lowest Category",
+      "5": "Product Title",
+      "6": "Subtitle",
+      "7": "Description",
+      "8": "What's in the Box",
+      "9": "Brand",
+      "10": "Warranty Type ",
+      "11": "Warranty Period",
+      "12": "Image 1",
+      "13": "Image 2",
+      "14": "Image 3",
+      "15": "Image 4",
+      "16": "Image 5",
+      "17": "Other Attribute Name",
+      "18": "Other Attribute Value",
+      "19": "Other Attribute Name",
+      "20": "Other Attribute Value",
+      "21": "Other Attribute Name",
+      "22": "Other Attribute Value",
+      "23": "Videos ",
+      "24": "Additional Comments"
+    },
+    "attribute_pairs": "cols 17/19/21=Other Attribute Name, 18/20/22=Other Attribute Value; copy label+value verbatim from the relevant loadsheet (label form e.g. \"Colours [0]\"); duplicable",
+    "dropdown_fields": [
+      "Warranty Type",
+      "Warranty Period"
+    ],
+    "category_source": "Main/Lowest Category copied from the relevant loadsheet Category Tree Lookup",
+    "filename_convention": "Seller Display Name - Seller ID - Edit Request - Request Date (.xlsx)"
+  },
+  "loadsheet_105": {
+    "data_sheet": "Loadsheet",
+    "machine_name_row": 1,
+    "label_row": 3,
+    "data_start_row": 7,
+    "standard_columns": {
+      "1": {
+        "machine": "Variant.ProductVariant",
+        "label": "Product or Variant"
+      },
+      "2": {
+        "machine": "SKU",
+        "label": "Your own SKU"
+      },
+      "3": {
+        "machine": "Variant.ProductCode",
+        "label": "Product SKU for Variant"
+      },
+      "4": {
+        "machine": "TopCategory",
+        "label": "Main Category"
+      },
+      "5": {
+        "machine": "Category",
+        "label": "Lowest Category"
+      },
+      "6": {
+        "machine": "ProductID.Value",
+        "label": "Barcode"
+      },
+      "7": {
+        "machine": "title",
+        "label": "Product Title"
+      },
+      "8": {
+        "machine": "subtitle",
+        "label": "Product Subtitle"
+      },
+      "9": {
+        "machine": "description",
+        "label": "Key Selling Features"
+      },
+      "10": {
+        "machine": "Attribute.whats_in_the_box",
+        "label": "What's in the Box"
+      },
+      "11": {
+        "machine": "Brand",
+        "label": "Brand Name"
+      },
+      "12": {
+        "machine": "color.main",
+        "label": "Main Colour"
+      },
+      "13": {
+        "machine": "color.secondary",
+        "label": "Secondary Colour"
+      },
+      "14": {
+        "machine": "color.name",
+        "label": "Colour Name"
+      },
+      "15": {
+        "machine": "Attribute.model_number",
+        "label": "Model Number"
+      },
+      "16": {
+        "machine": "Attribute.materials.[0]",
+        "label": "Main Material/Fabric"
+      }
+    },
+    "total_columns": 213,
+    "key_rules": {
+      "title_col": "G(7)",
+      "title_max": "75",
+      "subtitle_col": "H(8)",
+      "subtitle_max": "110",
+      "barcode_col": "F(6)",
+      "barcode_max": "20",
+      "main_category_col": "D(4) list",
+      "lowest_category_col": "E(5) dependent list"
+    },
+    "validation_rule_count": 186,
+    "category_tree_count": 98,
+    "category_tree_sample": [
+      {
+        "main": "Networking (15724)",
+        "lowest": "USB Networking Device (20839)"
+      },
+      {
+        "main": "Networking (15724)",
+        "lowest": "Switches & Servers->Servers (30390)"
+      },
+      {
+        "main": "Networking (15724)",
+        "lowest": "Switches & Servers->Switches (30389)"
+      }
+    ],
+    "lookup_tabs": [
+      "Brand Look up",
+      "CPU Type",
+      "Materials",
+      "Card Series",
+      "Country of Origin"
+    ],
+    "rules_live_source": "read ls.data_validations at export time to enforce every column constraint"
+  },
+  "loadsheet_120": {
+    "data_sheet": "Loadsheet",
+    "machine_name_row": 1,
+    "label_row": 3,
+    "data_start_row": 7,
+    "standard_columns": {
+      "1": {
+        "machine": "Variant.ProductVariant",
+        "label": "Product or Variant"
+      },
+      "2": {
+        "machine": "SKU",
+        "label": "Your own SKU"
+      },
+      "3": {
+        "machine": "Variant.ProductCode",
+        "label": "Product SKU for Variant"
+      },
+      "4": {
+        "machine": "TopCategory",
+        "label": "Main Category"
+      },
+      "5": {
+        "machine": "Category",
+        "label": "Lowest Category"
+      },
+      "6": {
+        "machine": "ProductID.Value",
+        "label": "Barcode"
+      },
+      "7": {
+        "machine": "title",
+        "label": "Product Title"
+      },
+      "8": {
+        "machine": "subtitle",
+        "label": "Product Subtitle"
+      },
+      "9": {
+        "machine": "description",
+        "label": "Key Selling Features"
+      },
+      "10": {
+        "machine": "Brand",
+        "label": "Brand Name"
+      },
+      "11": {
+        "machine": "Attribute.whats_in_the_box",
+        "label": "What's in the Box"
+      },
+      "12": {
+        "machine": "color.main",
+        "label": "Main Colour"
+      },
+      "13": {
+        "machine": "color.secondary",
+        "label": "Secondary Colour"
+      },
+      "14": {
+        "machine": "color.name",
+        "label": "Colour Name"
+      },
+      "15": {
+        "machine": "Attribute.model_number",
+        "label": "Model Number"
+      },
+      "16": {
+        "machine": "Attribute.materials.[0]",
+        "label": "Main Material/Fabric"
+      }
+    },
+    "total_columns": 174,
+    "key_rules": {
+      "title_col": "G(7)",
+      "title_max": "75",
+      "subtitle_col": "H(8)",
+      "subtitle_max": "110",
+      "barcode_col": "F(6)",
+      "barcode_max": "20",
+      "main_category_col": "D(4) list",
+      "lowest_category_col": "E(5) dependent list"
+    },
+    "validation_rule_count": 145,
+    "category_tree_count": 38,
+    "category_tree_sample": [
+      {
+        "main": "Video Game Accessories (15797)",
+        "lowest": "Sensor Bars (30861)"
+      },
+      {
+        "main": "Video Game Accessories (15797)",
+        "lowest": "Keyboard & Mouse Sets (30980)"
+      },
+      {
+        "main": "Video Game Accessories (15797)",
+        "lowest": "Gaming Memory Cards (30784)"
+      }
+    ],
+    "lookup_tabs": [
+      "Brand Look up",
+      "Game Designers",
+      "Game Genres"
+    ],
+    "rules_live_source": "read ls.data_validations at export time to enforce every column constraint"
+  },
+  "routing": {
+    "rule": "TSIN present -> edit_request; else -> loadsheet by CAT2",
+    "decide_by": "match product category against each loadsheet Category Tree Lookup; 105=computer-components, 120=gaming",
+    "cat2": {
+      "computer components": "105",
+      "gaming": "120"
+    }
+  }
+}

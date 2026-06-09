@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Client jobs hold client-specific data — keep only the template
+/clients/*
+!/clients/_TEMPLATE/
+
+# Stray spreadsheet data (never commit raw client workbooks)
+*.xlsx
+*.xls
+!/clients/_TEMPLATE/**
+
+# Per-user local Claude Code settings (use settings.example.json as the shared template)
+.claude/settings.local.json

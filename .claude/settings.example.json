@@ -1,0 +1,14 @@
+{
+  "_comment": "EXAMPLE ONLY. Copy to settings.json and confirm the event names and the output/context-injection contract against the current Claude Code hooks documentation before relying on it. SessionStart pulls the full dossier once to anchor the session; UserPromptSubmit re-asserts the condensed core each turn (and is what survives compaction); the gate must block.",
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": ".claude/hooks/persona_load.sh" } ] }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": ".claude/hooks/persona_reassert.sh" } ] }
+    ],
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [ { "type": "command", "command": ".claude/hooks/gates.sh" } ] }
+    ]
+  }
+}
