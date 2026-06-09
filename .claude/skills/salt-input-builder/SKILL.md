@@ -32,8 +32,11 @@ A brand- and product-agnostic core plus category profiles built per job.
 
 - Core (`scripts/`): provenance ledger, template schema detection, deterministic
   build, independent audit (including agnostic cross-row checks like duplicate
-  identifiers), link liveness, and a generic rule engine (`profile_engine.py`).
-  None of it holds any brand or category knowledge.
+  identifiers), link liveness, identity matching (`match.py` — links product
+  variants to SKUs across two sheets via strong key -> exact model-token blocking
+  -> colour/storage gates -> global one-to-one assignment -> abstention; it leaves
+  a blank with a reason rather than assert an identifier it cannot prove), and a
+  generic rule engine (`profile_engine.py`). None holds brand or category knowledge.
 - Category profiles: the data semantics for a category (metric ranges, identifier
   decoders, cross-field rules) are NOT shipped with the skill. They are built per
   job by inspecting the actual product and category data, confirmed by the user,

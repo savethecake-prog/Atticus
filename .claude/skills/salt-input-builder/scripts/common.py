@@ -104,3 +104,78 @@ def load_json(path):
 def save_json(path, obj):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, indent=2, ensure_ascii=False)
+
+
+# ---- header lookup (Phase D: brittle string-handling fixes) -----------------
+# Lesson 2026-06-09: source headers differ file to file, carry typos and unit
+# suffixes ("Packaged Weight CCM)" / "(g)" / "(CM)"), and a 22-char-truncated
+# console dump must NEVER be transcribed into code. Always read the real header
+# row and match by normalised key (exact) or normalised prefix.
+
+def nkey(s):
+    """Normalised header key: lowercase alphanumerics only. 'Packaged Weight (g)'
+    and 'Packaged Weight CCM)' both start with 'packagedweight'."""
+    return re.sub(r"[^a-z0-9]", "", norm(s))
+
+
+def header_map(header_row):
+    """{normalised key -> column index} for a header row (list of cell values).
+    First occurrence wins, so a duplicated header does not silently overwrite."""
+    idx = {}
+    for i, h in enumerate(header_row):
+        k = nkey(h)
+        if k and k not in idx:
+            idx[k] = i
+    return idx
+
+
+def lookup(row, hmap, *candidates, prefix=None):
+    """Value from a row by candidate header names (exact normalised match), then
+    by normalised prefix. Returns "" when absent. This is the one true way to
+    pull a source cell; do not index by a hard-coded column number or a name
+    copied from truncated output."""
+    for c in candidates:
+        k = nkey(c)
+        if k in hmap and hmap[k] < len(row):
+            return norm_value(row[hmap[k]])
+    if prefix:
+        pk = nkey(prefix)
+        for k, i in hmap.items():
+            if k.startswith(pk) and i < len(row):
+                v = norm_value(row[i])
+                if v:
+                    return v
+    return ""
+
+
+def norm_value(v):
+    """Trim a cell value to a clean string without lower-casing it (preserves the
+    real value; use norm() only for matching/comparison)."""
+    if v is None:
+        return ""
+    return re.sub(r"\s+", " ", str(v).replace(" ", " ")).strip()
+
+
+# ---- gap taxonomy (Phase D: one complete classification pass) ----------------
+# Every empty target cell is exactly one of these. Classifying up front means the
+# web pass is one complete pass (no front-camera-style follow-up) and the
+# to-chase list is exact.
+GAP_KINDS = (
+    "derivable",       # present in source under another name / composable -> map, don't fetch
+    "web_targetable",  # model-intrinsic, region-agnostic -> safe to web-source by model#
+    "region_variable", # may differ by market (EAN, local colour, packaging) -> chase distributor
+    "structural_blank" # absent everywhere by nature (e.g. TSIN pre-listing) -> leave blank
+)
+
+
+def classify_gap(field, *, derivable_fields=(), region_variable_fields=(),
+                 structural_blank_fields=()):
+    """Classify an empty target field. Sets are supplied per job (from the mapping
+    profile); anything not named is treated as web_targetable by default."""
+    if field in structural_blank_fields:
+        return "structural_blank"
+    if field in derivable_fields:
+        return "derivable"
+    if field in region_variable_fields:
+        return "region_variable"
+    return "web_targetable"

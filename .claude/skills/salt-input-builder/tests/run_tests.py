@@ -301,12 +301,87 @@ def test_completeness():
     os.remove(path)
 
 
+# --- identity matching (Phase A: regression from the Infinity 2026-06-09 failures) ---
+def test_match():
+    import match
+    T = [
+        {"id": "OA40SBB", "brand": "Oppo", "sku": "OA40SBB", "barcode": "",
+         "title": "Oppo A40 (Sparkle Black, 128 GB) (4 GB RAM)"},
+        {"id": "OA40SBL", "brand": "Oppo", "sku": "OA40SBL", "barcode": "",
+         "title": "Oppo A40 Starry Blue (Starry Purple, 128 GB) (4 GB RAM)"},
+        {"id": "OR12FOG", "brand": "Oppo", "sku": "OR12FOG", "barcode": "",
+         "title": "oppo Reno12 F 4G Dual Sim 256GB (Green, 256 GB) (8 GB RAM) +Free Oppo Jaua Watch"},
+        {"id": "OR12FMG", "brand": "Oppo", "sku": "OR12FMG", "barcode": "",
+         "title": "Oppo Reno12 F (Matte Grey, 256 GB) (8 GB RAM)+Free Oppo Jaua Watch"},
+        {"id": "CPH2629", "brand": "Oppo", "sku": "CPH2629", "barcode": "",
+         "title": "Oppo Reno12 Pro 5G (Space Brown, 512 GB) (12 GB RAM) +Free Oppo Jaua Watch"},
+        {"id": "OR13BL", "brand": "Oppo", "sku": "OR13BL", "barcode": "",
+         "title": "Oppo Reno 13 5G (Luminous Blue, 512 GB) (12 GB RAM)+Free Oppo Jaua Watch"},
+        {"id": "AOPROG", "brand": "Oppo", "sku": "AOPROG", "barcode": "",
+         "title": "Oppo A5 Pro (Olive Green, 256 GB) (8 GB RAM)"},
+        {"id": "OA5MP", "brand": "Oppo", "sku": "OA5MP", "barcode": "",
+         "title": "Oppo A5 (Midnight Purple, 256 GB) (8 GB RAM)"},
+        {"id": "H72B", "brand": "Hisense", "sku": "H72B", "barcode": "",
+         "title": "Hisense H72 with Free Bluetooth Speaker"},
+        {"id": "H72BLL", "brand": "Hisense", "sku": "H72BLL", "barcode": "",
+         "title": "Hisense H72 (Blue, 128 GB)"},
+        {"id": "V30E", "brand": "Vivo", "sku": "6935117884578", "barcode": "6935117884578",
+         "title": "vivo V30e (12 GB RAM)"},
+    ]
+    S = [
+        {"id": "a40sb", "brand": "Oppo", "colour": "Sparkle Black", "storage": "128",
+         "model": "Oppo A40 Sparkle Black 4GB RAM 128", "model_number": "CPH2669"},
+        {"id": "a40sp", "brand": "Oppo", "colour": "Starry Purple", "storage": "128",
+         "model": "Oppo A40 Starry Purple 4GB RAM 128", "model_number": "CPH2669"},
+        {"id": "r12fog", "brand": "Oppo", "colour": "Olive Green", "storage": "256",
+         "model": "Oppo Reno 12F Olive Green 8GB RAM 256", "model_number": "CPH2687"},
+        {"id": "r12fmg", "brand": "Oppo", "colour": "Matte Gray", "storage": "256",
+         "model": "Oppo Reno 12 F Matte Gray 8GB RAM 256", "model_number": "CPH2687"},
+        {"id": "r12pro", "brand": "Oppo", "colour": "Space Brown", "storage": "512",
+         "model": "Oppo Reno 12 PRO 5G 512GB 12GB Space Brown", "model_number": "CPH2629"},
+        {"id": "r13", "brand": "Oppo", "colour": "Luminous Blue", "storage": "512",
+         "model": "Oppo Reno 13 5G Luminous Blue 12GB 512", "model_number": "CPH2689"},
+        {"id": "a5promb", "brand": "Oppo", "colour": "Mocha Brown", "storage": "256",
+         "model": "Oppo A5 Pro Mocha Brown 8GB RAM 256", "model_number": "CPH2695"},
+        {"id": "a5proog", "brand": "Oppo", "colour": "Olive Green", "storage": "256",
+         "model": "OPPO A5 Pro Olive Green 8GB RAM 256", "model_number": "CPH2695"},
+        {"id": "a5mp", "brand": "Oppo", "colour": "Midnight Purple", "storage": "256",
+         "model": "OPPO A5 Midnight Purple 8GB RAM 256", "model_number": "CPH2727"},
+        # two genuinely indistinguishable rows (same model, colour, storage) -> must abstain
+        {"id": "h72a", "brand": "Hisense", "colour": "Blue", "storage": "128",
+         "model": "Hisense H72 Blue", "model_number": "HLTE270E"},
+        {"id": "h72b", "brand": "Hisense", "colour": "Blue", "storage": "128",
+         "model": "Hisense H72 Blue", "model_number": "HLTE270E"},
+        {"id": "v30e", "brand": "Vivo", "colour": "Green", "storage": "256",
+         "model": "vivo V30e Green 12GB RAM 256", "barcode": "6935117884578", "model_number": "V2339"},
+    ]
+    res = {r["source_id"]: r for r in match.match(S, T)}
+    want = {  # source -> expected SKU, or None for must-abstain
+        "a40sb": "OA40SBB", "a40sp": "OA40SBL",        # colour variants split, not collapsed
+        "r12fog": "OR12FOG", "r12fmg": "OR12FMG",      # near-dup of reno13, blocked apart
+        "r12pro": "CPH2629",                            # model# in SKU (strong key)
+        "r13": "OR13BL",                                # not cross-assigned to reno12f
+        "a5proog": "AOPROG", "a5mp": "OA5MP",          # a5 vs a5pro blocked apart
+        "a5promb": None,                                # no listed SKU -> abstain, not a wrong guess
+        "h72a": None, "h72b": None,                     # same colour+storage -> indistinguishable
+        "v30e": "6935117884578",                        # barcode strong key
+    }
+    for sid, exp in want.items():
+        got = res[sid]
+        if exp is None:
+            check(f"match: {sid} abstains", got["status"] == "abstained", str(got))
+        else:
+            check(f"match: {sid} -> {exp}", got["status"] == "matched" and got["sku"] == exp, str(got))
+    skus = [r["sku"] for r in res.values() if r["status"] == "matched"]
+    check("match: no SKU reused across rows", len(skus) == len(set(skus)), str(skus))
+
+
 def main():
     for fn in [test_engine_fixtures, test_engine_guards, test_conflicts, test_ledger_validate,
                test_profile_builder, test_linkcheck_offline, test_duplicate_sku,
                test_jobspec, test_schema_store, test_runner, test_primary_source,
                test_confidence, test_fields, test_hide_blank_columns,
-               test_from_spec_table, test_completeness]:
+               test_from_spec_table, test_completeness, test_match]:
         try:
             fn()
         except Exception as ex:  # noqa
