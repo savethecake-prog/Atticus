@@ -12,7 +12,7 @@ Atticus keeps a decision log per job at `clients/<client>/decision_log.md` so th
 
 ## Layout
 - `CLAUDE.md` the Atticus persona, the operating loop, the decide-do boundary, and the full constitution every agent inherits.
-- `.claude/skills/salt-input-builder/` the master skill: methodology plus the Python tooling (fields/from_spec_table, ledger, completeness, confidence, build, audit, standardise) and the 60-test suite.
+- `.claude/skills/salt-input-builder/` the master skill: methodology plus the Python tooling (schema detection, fields/from_spec_table, identity matching, ledger, the completeness and coverage-closure gates, confidence, derive, build, consolidate, audit, standardise, delivery) and the 139-test suite.
 - `.claude/skills/salt-input-builder-takealot/` the Takealot exporter sub-skill.
 - `.claude/agents/` the seven instruments: intake, sourcer, builder, auditor, standardiser, exporter, reporter. Each is execute-and-surface, not decide.
 - `.claude/hooks/` the deterministic gate script and the persona-reassert script.
@@ -35,11 +35,25 @@ One honest caveat. The once-per-session full pull persists only until the first 
 Wire all three via `.claude/settings.example.json`. The exact hook event names and the context-injection contract change over time, so confirm them against the current Claude Code hooks documentation before wiring. In particular, confirm that SessionStart stdout is injected as session context rather than merely executed.
 
 
+## The three-state model and the closure gates
+
+A target field is never just filled-or-blank. It is one of three states: a **value** (write it, with provenance), a **sourced negative** (provably absent from the complete captured table, written "No" and recorded `answer_kind: absent` with the page), or an **unknown** (genuinely not yet found). A marker string in a cell is retired — it shipped noise to the listing and hid the difference between "we know it is absent" and "we have not looked".
+
+Two deterministic gates enforce the symmetry "no value without a source, and no negative without a search":
+
+- **Coverage** (`completeness.column_coverage`): no target column empty across every product, and no row blank on a column its siblings fill — unless it is a sourced-absent with evidence or a structural blank (a pre-listing TSIN).
+- **Closure** (`completeness.coverage_closure`): every blank target cell must be closed — by a value, a sourced `absent`, or a `deferred` record carrying a `search_receipt` (we tried; it is vendor-only or not public). A blank with no closing record is `unknown` and may not ship, and may not be called absent or unpublished without a recorded search.
+
+When coverage finds unresolved blanks, the orchestrator runs the **closure reflex** (`closure.py`): gate → brief → fan out one sourcer per gap-product → merge → re-gate → receipt the residue. Human-in-the-loop is preserved by construction — identity fields (barcode, SKU, TSIN, model number) are never web-sourced; they are deferred to the distributor master with a receipt and a human confirm (the GEX750 discipline). Only spec fields are auto-sourced.
+
+**Identity matching** (`match.py`) links product variants to their SKU across sheets via strong key → exact model-token blocking → colour/storage hard gates → global one-to-one assignment → principled abstention. It abstains (blank plus a reason) rather than assert an identifier it cannot prove — built from the real Infinity-job failures where a colour-blind or greedy join cross-assigned SKUs.
+
 ## Phase status
 - Phase 0 (this scaffold): skills ported, persona at root, agents re-scoped to execute-and-surface, hooks and decision-log convention added, tests green. DONE.
+- Phase 0.5 (input-fidelity hardening): three-state model, semantic alias mapping, the coverage and closure gates, the closure-reflex loop, and the identity-matching module landed; suite grown to 139. DONE.
 - Phase 1: wire the gate and persona-reassert scripts as Claude Code hooks so they fire automatically. Confirm the current hook event schema first.
 - Phase 2: replay the Endorfy golden job end to end and prove it reproduces the verified output.
 - Phase 3: config-driven onboarding from a manifest. Phase 4: MCP integrations (distributor PIM for identifiers, fetching, SALT handoff). Phase 5: hardening and the learnings feedback loop.
 
 ## Run the gates
-`bash .claude/hooks/gates.sh` runs the test suite. The per-job gates (completeness, standardise) run via the skill's `runner.py`.
+`bash .claude/hooks/gates.sh` runs the test suite (139 cases). The per-job gates (completeness, coverage, closure, standardise) run via the skill's `runner.py`.
