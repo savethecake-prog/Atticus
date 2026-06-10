@@ -65,14 +65,28 @@ def needs_you(schema, entries, built_path=None):
         for tab, t in schema.get("tabs", {}).items():
             if tab not in wb.sheetnames:
                 continue
-            ws = wb[tab]; roles = t["roles"]; cols = _sourced_cols(roles)
+            ws = wb[tab]; roles = t["roles"]; hr = t.get("header_row", 1)
+            cols = _sourced_cols(roles)
             cols |= set((t.get("extra_fields") or {}).values())
+            gc = t.get("gap_classes", {}) or {}
             for r in range(t["first_data_row"], ws.max_row + 1):
                 if r in t.get("example_rows", []) or ws.cell(r, roles.get("title", 1)).value in (None, ""):
                     continue
-                blank = [c for c in cols if ws.cell(r, c).value in (None, "")]
-                if blank:
-                    q.append(f"gap {tab} r{r}: {len(blank)} sourced cell(s) blank (left empty, not guessed)")
+                by_kind = {}
+                for c in cols:
+                    if ws.cell(r, c).value in (None, ""):
+                        field = str(ws.cell(hr, c).value or f"col{c}").strip().rstrip(":").strip()
+                        kind = common.classify_gap(
+                            field,
+                            derivable_fields=gc.get("derivable", ()),
+                            region_variable_fields=gc.get("region_variable", ()),
+                            structural_blank_fields=gc.get("structural_blank", ()))
+                        by_kind.setdefault(kind, []).append(field)
+                # structural blanks are expected (e.g. a pre-listing TSIN); don't nag.
+                chase = {k: sorted(set(fs)) for k, fs in by_kind.items() if k != "structural_blank"}
+                if chase:
+                    detail = "; ".join(f"{k}: {', '.join(fs)}" for k, fs in sorted(chase.items()))
+                    q.append(f"gap {tab} r{r}: {detail} (left blank, not guessed)")
     return q
 
 

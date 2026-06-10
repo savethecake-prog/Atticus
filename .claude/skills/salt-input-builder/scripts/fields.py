@@ -15,7 +15,7 @@ from __future__ import annotations
 import re
 from openpyxl import load_workbook
 from openpyxl.styles import Font
-from common import BODY_FONT
+from common import BODY_FONT, nkey as _nk
 
 
 def _toks(s):
@@ -43,18 +43,62 @@ def _match_score(fkeys, hkeys):
     return len(fkeys & hkeys) / len(fkeys | hkeys)  # Jaccard
 
 
-def reconcile(tab_schema, discovered):
+def _alias_index(aliases):
+    """{normalised synonym -> canonical header} from {canonical: [synonyms]}.
+    Each canonical also maps to itself, so an exact canonical name resolves too."""
+    idx = {}
+    for canon, syns in (aliases or {}).items():
+        idx.setdefault(_nk(canon), canon)
+        for s in (syns or []):
+            idx.setdefault(_nk(s), canon)
+    return idx
+
+
+def reconcile(tab_schema, discovered, aliases=None, required_fields=()):
     """discovered: list of {"field": name, "keywords": [...]?}.
-    Returns list of decisions: {field, action: existing|relabel|new, col|None}."""
+
+    aliases: {canonical_header: [synonym, ...]}, confirmed once per category. Lets a
+        source field whose NAME differs map to the column that MEANS the same thing
+        (e.g. "Tilt mechanism" -> "Tilt function") by meaning, not token overlap, so
+        a synonym fills its column instead of spawning a blank duplicate beside it.
+    required_fields: client-owned required/identity headers (Category, SKU, EAN, ...).
+        A source field that is a synonym of one is DROPPED, never added as a second
+        column - this is the "Product type" beside "Category" failure.
+
+    Returns decisions: {field, action: existing|relabel|new|drop, col|None, ...}.
+    A 'new' decision (and a non-exact token match) carries uncertain=True so it is
+    surfaced for confirmation rather than silently appended - the one place a
+    duplicate column could otherwise sneak back in.
+    """
     roles = tab_schema["roles"]
     labels = {int(c): v for c, v in tab_schema.get("labels", {}).items()}
     a, b = roles["spec_start"], roles["spec_end"]
     labelled = {c: labels.get(c) for c in range(a, b + 1)
                 if labels.get(c) not in (None, "") and not _is_spare(labels.get(c))}
     spares = [c for c in range(a, b + 1) if _is_spare(labels.get(c))]
+    aidx = _alias_index(aliases)
+    label_by_key = {_nk(lab): c for c, lab in labelled.items()}
+    req_keys = {_nk(r) for r in (required_fields or ())}
     decisions = []
     for d in discovered:
         field = d["field"] if isinstance(d, dict) else d
+        # 1) confirmed alias: map by MEANING, before any token scoring
+        canon = aidx.get(_nk(field))
+        if canon:
+            ck = _nk(canon)
+            if ck in label_by_key:
+                col = label_by_key[ck]
+                decisions.append({"field": field, "action": "existing", "col": col,
+                                  "header": labelled[col], "exact": _nk(field) == ck,
+                                  "score": 1.0, "via": "alias"})
+                continue
+            if ck in req_keys:
+                decisions.append({"field": field, "action": "drop", "col": None, "via": "alias",
+                                  "canonical": canon,
+                                  "why": f"synonym of the client-owned required field '{canon}' - "
+                                         f"not added as a duplicate column"})
+                continue
+        # 2) token-overlap match to an existing labelled column (unchanged)
         keys = _toks(field)
         if isinstance(d, dict):
             for k in d.get("keywords", []):
@@ -68,11 +112,13 @@ def reconcile(tab_schema, discovered):
             header = labelled.get(best_col)
             exact = _toks(field) == _toks(header)
             decisions.append({"field": field, "action": "existing", "col": best_col,
-                              "header": header, "exact": exact, "score": round(best, 2)})
+                              "header": header, "exact": exact, "score": round(best, 2),
+                              "uncertain": (not exact) and best < 0.9})
         elif spares:
             decisions.append({"field": field, "action": "relabel", "col": spares.pop(0)})
         else:
-            decisions.append({"field": field, "action": "new", "col": None})
+            # a genuinely new column: always surfaced for confirmation, never silent.
+            decisions.append({"field": field, "action": "new", "col": None, "uncertain": True})
     return decisions
 
 
@@ -93,6 +139,10 @@ def apply(template_path, schema, tab, decisions):
             if d.get("exact") is False:
                 notes[str(d["col"])] = (f"column header '{d.get('header')}' filled from source field "
                                         f"'{d['field']}' - names not identical; confirm this is the right column")
+        elif d["action"] == "drop":
+            # a synonym of a client-owned required field: recorded, never added as a column
+            t.setdefault("dropped_synonyms", {})[d["field"]] = d.get("canonical", "")
+            continue
         elif d["action"] == "relabel":
             c = d["col"]
             ws.cell(t["header_row"], c, value=d["field"]).font = Font(bold=True, **BODY_FONT)

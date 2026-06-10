@@ -16,6 +16,17 @@ from openpyxl.utils import get_column_letter
 TIERS = ("manufacturer", "retailer", "client", "derived")
 WEB_TIERS = ("manufacturer", "retailer")  # these require url + snippet
 
+# How a cell was ANSWERED, orthogonal to the source tier above:
+#   value  = a positive sourced value (the default for every existing entry).
+#   absent = a sourced NEGATIVE. The feature is not in the COMPLETE published
+#            table, so the honest answer is "No". Its basis is a note + the page
+#            that shows the full table, NOT a positive snippet. Scored high unless
+#            the table's completeness is itself uncertain.
+#   unknown= genuinely unpublished. Carries NO ledger entry at all; the cell is
+#            left blank and the field goes to the needs-you chase queue. (Listed
+#            for completeness; the build never writes a marker string into a cell.)
+ANSWER_KINDS = ("value", "absent", "unknown")
+
 # Default confidence colours (fill, font). Override via job spec.
 DEFAULT_COLOURS = {
     "manufacturer": {"fill": "C6EFCE", "font": "006100"},  # green

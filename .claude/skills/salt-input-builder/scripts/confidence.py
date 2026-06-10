@@ -28,6 +28,8 @@ def _not_verbatim(entry):
     """A web value whose exact text is not in its snippet is 'disputed': it exists
     on a source but isn't verbatim-confirmed (e.g. a legacy/long-published figure,
     or an interpreted value). We write it, score it low, and say why."""
+    if entry.get("answer_kind") == "absent":
+        return False  # a sourced negative has no positive value to verbatim-check
     return (entry.get("provenance") in WEB_TIERS and entry.get("snippet")
             and not value_supported_by_snippet(entry.get("value"), entry.get("snippet")))
 
@@ -69,6 +71,11 @@ def band(score):
 def score_entry(entry):
     """Return (score 0-100, detailed reason) naming the sources, in the pre-skill style."""
     prov = entry.get("provenance")
+    if entry.get("answer_kind") == "absent":
+        # A sourced negative: confident when the captured table is complete.
+        if entry.get("completeness_uncertain"):
+            return 50, (entry.get("note") or "asserted absent, but the source table's completeness is unconfirmed - verify")
+        return 88, (entry.get("note") or "feature not present in the complete published spec table")
     doubt = entry.get("doubt_reason")
     if not doubt and _not_verbatim(entry):
         doubt = "value not stated verbatim in the captured source snippet; confirm or remove"
@@ -103,6 +110,8 @@ def eligible(entry):
     agreeing sources, OR client/derived). The value is written either way; this is
     reported to SALT and used to flag, not to suppress the write. A disputed
     (doubt_reason / non-verbatim) value is never eligible."""
+    if entry.get("answer_kind") == "absent":
+        return not entry.get("completeness_uncertain")
     if entry.get("doubt_reason") or _not_verbatim(entry):
         return False
     prov = entry.get("provenance")

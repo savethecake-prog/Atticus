@@ -10,7 +10,8 @@ Inherit CLAUDE.md. Your slice is section 1 and section 5.
 
 Do:
 - Source per product code, manufacturer first; a code-matched reputable mirror only where the manufacturer does not publish or cannot be fetched, and record which was used.
-- Capture the WHOLE published spec table via from_spec_table, not a hand-picked core. Under-capture is a defect.
+- Capture the WHOLE published spec table via from_spec_table, not a hand-picked core. Under-capture is a defect. Capture the logistics/packaging block AND any linked datasheet/PDF too - net weight, gross weight and box dimensions live there and are the net/gross under-capture we are fixing. Record how many fields the source published (`source_field_count`) so completeness can measure even a lone product.
+- Source "What's in the Box" from the manufacturer's box-contents / "Set includes". If it is unpublished, leave it blank - never invent box contents (the invented contents were the worst defect in the Endorfy review).
 - Record provenance, source URL, snippet and confidence per cell in the ledger.
 - Leave blanks for unpublished fields. Flag, do not resolve: conflicts (record both, note the manufacturer value), single-source values, and anything genuinely unpublished, with the reason. Identifiers come from the manifest's source of truth, never web-scraped; a model number may be derived from the title only if flagged title-derived.
 

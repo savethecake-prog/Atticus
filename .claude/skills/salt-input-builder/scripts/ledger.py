@@ -30,7 +30,7 @@ trusted. A field with a single observation needs no candidates list.
 """
 from __future__ import annotations
 import re
-from common import TIERS, WEB_TIERS, value_supported_by_snippet, norm, load_json, save_json
+from common import TIERS, WEB_TIERS, ANSWER_KINDS, value_supported_by_snippet, norm, load_json, save_json
 
 REQUIRED = ("tab", "row", "field", "column", "value", "provenance")
 
@@ -48,9 +48,20 @@ def validate(entries):
             if e.get(k) in (None, ""):
                 v.append(f"{tag}: missing required field '{k}'")
         prov = e.get("provenance")
+        kind = e.get("answer_kind", "value")
+        if kind not in ANSWER_KINDS:
+            v.append(f"{tag}: answer_kind '{kind}' not one of {ANSWER_KINDS}")
         if prov not in TIERS:
             v.append(f"{tag}: provenance '{prov}' not one of {TIERS}")
-        if prov in WEB_TIERS:
+        if kind == "absent":
+            # A sourced NEGATIVE ("No"): its basis is the COMPLETE table showing
+            # the feature is not listed, not a positive snippet. Require the page
+            # and an explaining note; skip the verbatim-snippet check.
+            if not e.get("source_url"):
+                v.append(f"{tag}: 'absent' answer needs a source_url (the page whose complete table omits the feature)")
+            if not e.get("note"):
+                v.append(f"{tag}: 'absent' answer needs a 'note' stating the basis (e.g. 'not in the complete published spec table')")
+        elif prov in WEB_TIERS:
             if not e.get("source_url"):
                 v.append(f"{tag}: {prov} value has no source_url")
             if not e.get("snippet"):
@@ -59,7 +70,7 @@ def validate(entries):
                 v.append(f"{tag}: value '{e.get('value')}' is not verbatim in its snippet. "
                          f"Do NOT drop it - add a 'doubt_reason' saying where the value comes from and why it "
                          f"may be false; it will be written, scored low, and disclosed for SALT to judge.")
-        if prov in ("client", "derived") and not e.get("note"):
+        if prov in ("client", "derived") and kind != "absent" and not e.get("note"):
             v.append(f"{tag}: {prov} value should carry a 'note' explaining its origin")
         cands = e.get("candidates")
         if cands:

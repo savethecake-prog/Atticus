@@ -64,8 +64,26 @@ _REPEATABLE = {"yes", "no", "n/a", "na", "none", "black", "white", "grey",
 _DIM = re.compile(
     r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)"
     r"(?:\s*[x×]\s*(\d+(?:[.,]\d+)?))?\s*(mm|cm|m)?\b", re.I)
-_WT = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*(kg|g)\b", re.I)
-_TEMP = re.compile(r"([+-]?\d+)\s*°?\s*C?\s*/\s*([+-]?\d+)\s*°?\s*C", re.I)
+_LEN_ONE = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s+(mm|cm|m)\b", re.I)  # lone "520 mm" -> "520mm"
+_WT = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*([kK][gG]|g)\b")  # 'g' lowercase only: "4G"/"5G" network is not grams
+_MONTHS = re.compile(r"\b(\d+)\s*[Mm]onths\b")                     # "12months"/"12 Months" -> "12 months"
+# temperatures carry a Celsius unit; angles carry a bare degree sign. Both spelled out.
+_TEMP_RANGE = re.compile(r"([+-]?\d+)\s*°?\s*C\s*(?:to|/|–|—|-)\s*([+-]?\d+)\s*°?\s*C", re.I)
+_TEMP_ONE = re.compile(r"([+-]?\d+)\s*°\s*C\b", re.I)
+_ANG_RANGE = re.compile(r"([+-]?\d+)\s*°\s*(?:to|/|–|—|-)\s*([+-]?\d+)\s*°")
+_ANG_ONE = re.compile(r"([+-]?\d+)\s*°(?!\s*C)")
+_QTY = re.compile(r"\b(\d+)\s*[x×]\s*(?=[A-Za-z])")        # "1x Chair" / "1 x chair" -> "1 x "
+_SOCKET = re.compile(r"[A-Za-z0-9]+\(\+\)")               # AM3(+) noise -> FLAG, never auto-strip
+
+# ASCII-safe substitutions (the "stick to a safe charset, no stray symbols" rule).
+# The degree sign is deliberately NOT dropped here: it is spelled out to
+# "degrees"/"degrees Celsius" by the passes above so the unit survives as words.
+_CHARSET = {
+    " ": " ", " ": " ", " ": " ",      # non-breaking spaces
+    "‑": "-", "‒": "-", "–": "-", "—": "-", "−": "-",  # hyphens/dashes/minus
+    "‘": "'", "’": "'", "“": '"', "”": '"',  # smart quotes
+    "×": "x", "™": "", "®": "", "©": "", "…": "...",  # x, tm, r, c, ellipsis
+}
 
 
 def _num(s):
@@ -86,15 +104,35 @@ def _norm_dim(m):
     if not unit:                       # cannot assert a unit -> leave untouched, flag elsewhere
         return m.group(0)
     nums = [_scale(p, factor) for p in parts]
-    return " x ".join(nums) + " mm"
+    # spaces around x, unit attached to the last number: "1300 x 690 x 640mm"
+    return " x ".join(nums[:-1] + [nums[-1] + "mm"])
+
+
+def _norm_len_one(m):
+    return f"{_num(m.group(1))}{m.group(2).lower()}"   # lone "520 mm" -> "520mm" (no scaling)
 
 
 def _norm_wt(m):
-    return f"{_num(m.group(1))} {m.group(2).lower()}"
+    return f"{_num(m.group(1))}{m.group(2).lower()}"   # "23.3 kg" -> "23.3kg"
 
 
-def _norm_temp(m):
-    return f"{m.group(1)} to {m.group(2)} \u00b0C"
+def _ascii_safe(s):
+    for k, v in _CHARSET.items():
+        s = s.replace(k, v)
+    return s
+
+
+def _pm(n):
+    return n[1:] if n.startswith("+") else n           # drop a leading +, keep a leading -
+
+
+def _spell_angles_temps(s):
+    s = _TEMP_RANGE.sub(lambda m: f"{_pm(m.group(1))} to {_pm(m.group(2))} degrees Celsius", s)
+    s = _TEMP_ONE.sub(lambda m: f"{_pm(m.group(1))} degrees Celsius", s)
+    s = _ANG_RANGE.sub(lambda m: f"{_pm(m.group(1))} to {_pm(m.group(2))} degrees", s)
+    s = _ANG_ONE.sub(lambda m: f"{_pm(m.group(1))} degrees", s)
+    s = s.replace("\u00b0C", " degrees Celsius").replace("\u00b0", " degrees")  # stray degree signs
+    return re.sub(r"\s{2,}", " ", s)
 
 
 def _uk(text):
@@ -113,22 +151,39 @@ def standardise_value(header, value):
     h = header.lower()
     if any(k in h for k in SKIP_VALUE):
         return value, []
-    # prose cells (What's in the Box, features, descriptions): spelling only.
-    # In prose, "2 x 120mm" is a quantity, not a dimension, so numeric
-    # reformatting would corrupt meaning.
+    # prose cells (What's in the Box, features, descriptions): charset + quantity
+    # spacing + spelling only; never numeric reformatting ("2 x 120mm" is a quantity).
     if any(k in h for k in PROSE) or len(value) > 80:
-        new = _uk(value)
-        return (new, ["UK spelling"]) if new != value else (value, [])
+        out, notes = value, []
+        new = _ascii_safe(out)
+        if new != out:
+            notes.append("charset"); out = new
+        new = _QTY.sub(lambda m: f"{m.group(1)} x ", out)
+        if new != out:
+            notes.append("quantity spacing"); out = new
+        new = _uk(out)
+        if new != out:
+            notes.append("UK spelling"); out = new
+        return out, notes
     out, notes = value, []
+    new = _ascii_safe(out)
+    if new != out:
+        notes.append("charset"); out = new
     new = _DIM.sub(_norm_dim, out)
     if new != out:
         notes.append("dimension format/unit"); out = new
+    new = _LEN_ONE.sub(_norm_len_one, out)
+    if new != out:
+        notes.append("unit spacing"); out = new
     new = _WT.sub(_norm_wt, out)
     if new != out:
         notes.append("weight format"); out = new
-    new = _TEMP.sub(_norm_temp, out)
+    new = _MONTHS.sub(r"\1 months", out)
     if new != out:
-        notes.append("temperature format"); out = new
+        notes.append("month spacing"); out = new
+    new = _spell_angles_temps(out)
+    if new != out:
+        notes.append("angle/temperature spelled out"); out = new
     if out.strip().lower() in ("yes", "no"):
         cap = out.strip().capitalize()
         if cap != out:
@@ -208,6 +263,11 @@ def check(path, fix_inplace=False):
                         and re.search(r"\d\s*[x\u00d7]\s*\d", v) and not re.search(r"(mm|cm|\bm\b)", v.lower()):
                     flags.append({"tab": ws.title, "row": r, "kind": "format", "col": hdr,
                                   "value": v, "why": "dimension/size has no unit - cannot normalise to mm safely"})
+                # socket-style noise like "AM3(+)" - flag for confirmation, never auto-strip
+                if isinstance(v, str) and _SOCKET.search(v):
+                    flags.append({"tab": ws.title, "row": r, "kind": "format", "col": hdr,
+                                  "value": v, "why": "value carries socket-style noise like 'AM3(+)'; "
+                                                     "confirm the intended plain form (e.g. 'AM3, AM2, & FM2')"})
                 # safe value fixes
                 new, notes = standardise_value(hdr, v)
                 if notes:

@@ -35,6 +35,18 @@ def _sourced_columns(roles):
     return cols
 
 
+def _gtin_ok(code):
+    """Valid GS1 barcode (GTIN-8/12/13/14): all digits, right length, and the
+    final check digit reconciles. A wrong barcode on the wrong product is exactly
+    the failure that reaches the customer, so format is checked, not assumed."""
+    s = str(code).strip()
+    if not s.isdigit() or len(s) not in (8, 12, 13, 14):
+        return False
+    body = [int(c) for c in s[:-1]][::-1]
+    total = sum(d * (3 if i % 2 == 0 else 1) for i, d in enumerate(body))
+    return (10 - total % 10) % 10 == int(s[-1])
+
+
 def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=None):
     colours = {**DEFAULT_COLOURS, **(colours or {})}
     profiles = profiles or {}
@@ -115,6 +127,32 @@ def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=No
             where = ", ".join(f"{tb} r{rw}" for tb, rw, _ in occ)
             for tb, rw, sc in occ:
                 F(tb, rw, [sc], "HARD", f"duplicate SKU '{val}' on multiple products ({where}). Confirm identifiers.")
+
+    # F2. EAN format + uniqueness (the GEX750 shared-barcode lesson)
+    eans = {}
+    for tab, t in schema["tabs"].items():
+        if tab not in wb.sheetnames:
+            continue
+        roles = t["roles"]; ecol = roles.get("ean"); scol = roles.get("sku")
+        if not ecol:
+            continue
+        ws = wb[tab]
+        for r in range(t["first_data_row"], ws.max_row + 1):
+            if r in t.get("example_rows", []) or ws.cell(r, roles.get("title", 1)).value in (None, ""):
+                continue
+            val = ws.cell(r, ecol).value
+            if val in (None, ""):
+                continue
+            code = str(val).strip()
+            if not _gtin_ok(code):
+                F(tab, r, [ecol], "HARD", f"EAN '{code}' is not a valid barcode (digits/length/check-digit).")
+            sku = str(ws.cell(r, scol).value).strip() if scol and ws.cell(r, scol).value else ""
+            eans.setdefault(code, []).append((tab, r, ecol, sku))
+    for code, occ in eans.items():
+        if len(occ) > 1 and len({sku for *_, sku in occ}) > 1:
+            where = ", ".join(f"{tb} r{rw}" for tb, rw, _, _ in occ)
+            for tb, rw, ec, _ in occ:
+                F(tb, rw, [ec], "HARD", f"EAN '{code}' shared across different SKUs ({where}). A barcode identifies one product.")
 
     # G. source conflicts (independent comparator over candidate observations)
     for tab, row, col, field, sev, msg in L.detect_conflicts(entries):

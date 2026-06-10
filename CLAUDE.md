@@ -82,6 +82,7 @@ A real example we traced: a chair's recline value sitting in the "Max seat tilti
 - Brand and product agnostic. Field sets are inferred from the source and confirmed, never hard-coded.
 - Provenance and confidence travel with the data.
 - Nothing from model memory. Product facts are sourced fresh every time.
+- No absence without a search. A blank narrated as "absent" or "unpublished" must cite the attempt, exactly as a value cites its source. A never-attempted blank is an unknown to chase, not a sourced negative — and the sourcing scope is derived from the target schema, never hand-listed, so no column is silently dropped.
 
 ---
 
@@ -103,9 +104,14 @@ The thirteen required fields are the Takealot required set and must be present o
 
 ## 3. Blank, marker, and identifier conventions
 
-- Required field not applicable to the category: leave blank. SALT drops empty not-applicable fields (for example operating temperature on a desk, a mouse, a chair). A blank here is correct, not a gap.
-- Required field applicable but not found: mark "Not specified". This is the to-chase signal.
-- Identifiers (EAN, TSIN) missing: leave blank, never a prose marker. A barcode field with text in it is worse than empty. A blank TSIN is expected for a new product, because no-TSIN products route to the loadsheet rather than an Edit Request.
+Three states, not two. Every target field is one of: a value, a sourced negative, or an unknown. The old two-state "mark 'Not specified'" rule is retired — a marker string in a cell defeats blank-column hiding and ships noise to the listing, and it hid the difference between "we know it is absent" and "we have not found it".
+
+- A value is present: write it. Before stamping any cell empty, check whether the value exists under a differently-named source field and map it to its column (the per-category alias map, `fields.reconcile`). A value sitting under a synonym is not a blank; leaving it blank beside a filled synonym is the failure we are fixing. An uncertain match is flagged for a human, never forced and never silently appended as a duplicate column.
+- A feature is provably absent (not in the COMPLETE captured table): write the sourced negative "No", recorded as `answer_kind: absent` with the page and a note (the basis is the complete table, not a positive snippet). Scored high unless the table's completeness is itself uncertain, in which case it is flagged. "No" is a correct, sourced answer; over-blanking a known negative is itself a failed product.
+- A value is genuinely unpublished: leave the cell blank in the delivery copy. The chase signal lives in the needs-you queue, classified by the gap taxonomy (derivable / web-targetable / region-variable / structural), never as marker text in a cell.
+- A value is computable from another sourced field (colour from title, total height from the published dimension axis): derive it with provenance (`derive.py`), recorded `derived` with a note and a confidence score, surfaced for confirmation. Net/gross map to Product/Packaging via the alias map and keep manufacturer provenance; only genuinely computed values are `derived`.
+- Required field not applicable to the category: leave blank. SALT drops empty not-applicable fields (operating temperature on a chair). A blank here is correct, not a gap.
+- Identifiers (EAN, TSIN) missing: leave blank, never a prose marker. A barcode field with text in it is worse than empty; a blank TSIN is expected for a new product. EAN format and uniqueness are checked at audit.
 - Variants: inherit the base specs explicitly, change only what differs (colour, keycaps), leave variant-specific identifiers for confirmation.
 
 ---
@@ -170,6 +176,7 @@ Run at the end of a job, re-deriving rather than trusting the build:
 - EAN format and uniqueness: valid, not shared across different SKUs.
 - Governance: every row carries provenance and confidence in the ledger.
 - Gate re-run: completeness and standardise come back clean.
+- Column coverage (the 2026-06-10 escapes): no target column empty across every product, and no row blank on a column its siblings fill — unless it is a sourced-absent with evidence or a structural blank (a pre-listing TSIN). `completeness.column_coverage`. The gate refuses to let an empty pass silently; it forces fill, evidence, or justification.
 
 Proven shape from the Endorfy job: 67 SKUs, 1606 source values, zero lost, zero misplaced.
 

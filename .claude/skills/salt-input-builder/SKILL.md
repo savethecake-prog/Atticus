@@ -37,6 +37,18 @@ A brand- and product-agnostic core plus category profiles built per job.
   -> colour/storage gates -> global one-to-one assignment -> abstention; it leaves
   a blank with a reason rather than assert an identifier it cannot prove), and a
   generic rule engine (`profile_engine.py`). None holds brand or category knowledge.
+- Synthesis layer (the 2026-06-10 remediation, all agnostic): semantic field
+  mapping via a confirmed per-category alias map (`fields.reconcile` with
+  `aliases`/`required_fields` — a synonym fills its column instead of spawning a
+  duplicate; a synonym of a client-owned required field is dropped); the three-state
+  answer model (`answer_kind` value / `absent` "No" / unknown-blank, in `ledger`,
+  `confidence`, and the gap taxonomy in `runner.needs_you`); derivation with
+  provenance (`derive.py`); the house style guide and ASCII charset (`standardise.py`);
+  the Excel-formatting pass (`format_xlsx.py`); the clean delivery copy
+  (`delivery.py`, analysis columns stripped, dead columns dropped); tranche
+  consolidation into one tab per category (`consolidate.py`); and EAN format +
+  uniqueness at audit. The marker string "Not specified" is retired: unknowns are
+  blank in delivery and chased via the needs-you queue.
 - Category profiles: the data semantics for a category (metric ranges, identifier
   decoders, cross-field rules) are NOT shipped with the skill. They are built per
   job by inspecting the actual product and category data, confirmed by the user,

@@ -376,12 +376,255 @@ def test_match():
     check("match: no SKU reused across rows", len(skus) == len(set(skus)), str(skus))
 
 
+# --- semantic field mapping (W1: alias map kills duplicate synonym columns) --
+def test_fields_semantic():
+    import fields
+    tab = {"roles": {"spec_start": 3, "spec_end": 5, "header_row": 1},
+           "labels": {"3": "Tilt function:", "4": "Chair upholstery:", "5": "Gas lift safety class:"}}
+    aliases = {"Tilt function": ["tilt mechanism"], "Chair upholstery": ["material"],
+               "Gas lift safety class": ["gas lift"], "Category": ["product type"]}
+    dec = {x["field"]: x for x in fields.reconcile(
+        tab, [{"field": "Tilt mechanism"}, {"field": "Material"}, {"field": "Gas lift"},
+              {"field": "Product type"}, {"field": "Whatsit rating"}],
+        aliases=aliases, required_fields=["Category", "SKU", "EAN", "TSIN"])}
+    check("fields/alias: 'Tilt mechanism' -> existing 'Tilt function:' column (no duplicate)",
+          dec["Tilt mechanism"]["action"] == "existing" and dec["Tilt mechanism"]["col"] == 3)
+    check("fields/alias: 'Material' -> 'Chair upholstery:'",
+          dec["Material"]["action"] == "existing" and dec["Material"]["col"] == 4)
+    check("fields/alias: 'Gas lift' -> 'Gas lift safety class:'",
+          dec["Gas lift"]["action"] == "existing" and dec["Gas lift"]["col"] == 5)
+    check("fields/alias: 'Product type' dropped as synonym of client-owned Category",
+          dec["Product type"]["action"] == "drop")
+    check("fields/alias: a genuinely new field is flagged uncertain, not silently appended",
+          dec["Whatsit rating"]["action"] == "new" and dec["Whatsit rating"].get("uncertain") is True)
+
+
+# --- three-state answer model (W0: value / sourced-"No" / unknown) ----------
+def test_answer_kind():
+    import confidence as C
+    # a sourced NEGATIVE: feature provably absent from the complete table -> "No"
+    absent = {"tab": "T", "row": 2, "field": "headrest", "column": 5, "value": "No",
+              "provenance": "manufacturer", "answer_kind": "absent",
+              "source_url": "https://maker/meta-bk",
+              "note": "not present in the complete published spec table"}
+    check("answer_kind: absent validates clean (note + url, no snippet needed)",
+          ledger.validate([absent]) == [], str(ledger.validate([absent])))
+    check("answer_kind: absent scored high and eligible",
+          C.score_entry(absent)[0] == 88 and C.eligible(absent))
+    bad = {"tab": "T", "row": 3, "field": "lumbar", "column": 6, "value": "No",
+           "provenance": "manufacturer", "answer_kind": "absent"}
+    check("answer_kind: absent without source_url/note is rejected",
+          any("absent" in v for v in ledger.validate([bad])))
+    unsure = dict(absent, completeness_uncertain=True)
+    check("answer_kind: absent under uncertain completeness scored low and held",
+          C.score_entry(unsure)[0] == 50 and not C.eligible(unsure))
+    # gap taxonomy in needs_you: web-targetable blank is chased; structural is not
+    import runner
+    wb = Workbook(); ws = wb.active; ws.title = "Chairs"
+    for c, h in enumerate(["Title", "Packaging weight:", "TSIN:"], 1):
+        ws.cell(1, c, h)
+    ws.cell(2, 1, "Chair A")  # both spec cells blank
+    os.makedirs("/tmp/th", exist_ok=True); wb.save("/tmp/th/chairs.xlsx")
+    schema = {"tabs": {"Chairs": {"roles": {"title": 1, "spec_start": 2, "spec_end": 2, "tsin": 3},
+                                  "labels": {}, "header_row": 1, "first_data_row": 2, "example_rows": [],
+                                  "gap_classes": {"structural_blank": ["TSIN"]}}}}
+    gapline = " ".join(n for n in runner.needs_you(schema, [], "/tmp/th/chairs.xlsx") if n.startswith("gap "))
+    check("answer_kind: web-targetable blank is chased",
+          "web_targetable" in gapline and "Packaging weight" in gapline, gapline)
+    check("answer_kind: structural blank (TSIN) is not nagged", "TSIN" not in gapline, gapline)
+
+
+# --- delivery copy (W2) and tranche consolidation (W7) ----------------------
+def test_delivery():
+    import delivery
+    from openpyxl import load_workbook
+    wb = Workbook(); ws = wb.active; ws.title = "Chairs"
+    for c, h in enumerate(["Title", "What's in the Box", "Seat depth", "Confidence",
+                           "Check notes", "Source (root)", "Operating temperature"], 1):
+        ws.cell(1, c, h)
+    ws.cell(2, 1, "Chair"); ws.cell(2, 2, "1 x Chair"); ws.cell(2, 3, "520mm")
+    ws.cell(2, 4, "93"); ws.cell(2, 5, "ok"); ws.cell(2, 6, "http://x")  # col 7 blank+hidden
+    ws.column_dimensions["G"].hidden = True
+    wb.create_sheet("Confidence key").cell(1, 1, "key")
+    os.makedirs("/tmp/th", exist_ok=True); src = "/tmp/th/an.xlsx"; wb.save(src)
+    w = load_workbook(delivery.make_delivery(src, "/tmp/th/del.xlsx")); s = w["Chairs"]
+    hdrs = [s.cell(1, c).value for c in range(1, s.max_column + 1)]
+    check("delivery: analysis columns stripped",
+          not any(str(h).lower().startswith(("confidence", "check", "source")) for h in hdrs), str(hdrs))
+    check("delivery: hidden blank column dropped", "Operating temperature" not in hdrs, str(hdrs))
+    check("delivery: confidence-key sheet removed", "Confidence key" not in w.sheetnames)
+    check("delivery: value preserved and formatted",
+          s.cell(2, 3).value == "520mm" and s.row_dimensions[1].height == 30)
+
+
+def test_consolidate():
+    import consolidate
+    from openpyxl import load_workbook
+    wb1 = Workbook(); ws1 = wb1.active; ws1.title = "Keyboards"
+    ws1.append(["Title", "Switch type", "SKU"]); ws1.append(["KB One", "Red", "K1"])
+    os.makedirs("/tmp/th", exist_ok=True); p1 = "/tmp/th/t1.xlsx"; wb1.save(p1)
+    wb2 = Workbook(); ws2 = wb2.active; ws2.title = "Keyboards (again)"
+    ws2.append(["Title", "Switch type", "Hot-swap", "SKU"]); ws2.append(["KB Two", "Blue", "Yes", "K2"])
+    p2 = "/tmp/th/t2.xlsx"; wb2.save(p2)
+    w = load_workbook(consolidate.consolidate([p1, p2], "/tmp/th/cons.xlsx"))
+    check("consolidate: one tab per category (no 'again')", w.sheetnames == ["Keyboards"], str(w.sheetnames))
+    s = w["Keyboards"]; hdrs = [s.cell(1, c).value for c in range(1, s.max_column + 1)]
+    check("consolidate: columns unioned (Hot-swap kept)", "Hot-swap" in hdrs, str(hdrs))
+    titles = [s.cell(r, 1).value for r in range(2, s.max_row + 1)]
+    check("consolidate: both rows present, none lost", titles == ["KB One", "KB Two"], str(titles))
+    hi = hdrs.index("Hot-swap") + 1
+    check("consolidate: a column a tranche lacks aligns blank, not shifted",
+          s.cell(2, hi).value in (None, ""))
+
+
+# --- completeness lone-product blind spot + EAN integrity (W9) ---------------
+def test_completeness_lone():
+    import completeness
+    wb = Workbook(); ws = wb.active; ws.title = "Chairs"
+    for c, h in enumerate(["Title", "Backrest height", "Seat depth", "Brand:", "SKU:"], 1):
+        ws.cell(1, c, h)
+    ws.append(["Chair A", "685mm", "520mm", "Endorfy", "EY8A005"])  # lone product, no source_field_count
+    p = os.path.join(HERE, "_tmp_lone.xlsx"); wb.save(p)
+    f = completeness.check(p, {"tabs": {"Chairs": {}}}, ratio=0.6, floor=2)
+    check("completeness: lone product without source_field_count flagged unverifiable",
+          any(x["row"] is None and "unverifiable" in x["why"] for x in f), str(f))
+    os.remove(p)
+
+
+def test_column_coverage():
+    import completeness
+    wb = Workbook(); ws = wb.active; ws.title = "Specs"
+    for c, h in enumerate(["Model", "Processor", "Colour depth", "SKU", "TSIN"], 1):
+        ws.cell(1, c, h)
+    ws.append(["P1", "SD1", "", "K1", ""])
+    ws.append(["P2", "SD2", "", "K2", ""])
+    ws.append(["P3", "SD3", "", "K3", ""])
+    ws.append(["P4", "SD4", "", "", ""])   # SKU blank here (the coverage hole)
+    path = os.path.join(HERE, "_tmp_cov.xlsx"); wb.save(path)
+    schema = {"tabs": {"Specs": {"roles": {"title": 1}, "header_row": 1, "first_data_row": 2,
+                                 "example_rows": [], "gap_classes": {"structural_blank": ["TSIN"]}}}}
+    f = completeness.column_coverage(path, schema, mostly=0.5)
+    kinds = {(x["kind"], x["col"]) for x in f}
+    check("coverage: all-empty non-structural column flagged (the colour-depth class)",
+          ("empty-column", "Colour depth") in kinds, str(kinds))
+    check("coverage: a column its siblings fill, blank on one row, flagged (the Xiaomi-block class)",
+          ("coverage-hole", "SKU") in kinds, str(kinds))
+    check("coverage: structural-blank column (TSIN) not flagged",
+          not any(col == "TSIN" for _, col in kinds))
+    check("coverage: a fully-filled column is not flagged",
+          not any(col in ("Model", "Processor") for _, col in kinds))
+    os.remove(path)
+
+
+def test_ean_integrity():
+    import audit
+    wb = Workbook(); ws = wb.active; ws.title = "Mice"
+    for c, h in {1: "Title", 2: "Spec", 3: "SKU", 4: "EAN"}.items():
+        ws.cell(1, c, h)
+    ws.cell(2, 1, "A"); ws.cell(2, 3, "SKU-A"); ws.cell(2, 4, "5903018666495")   # valid EAN-13
+    ws.cell(3, 1, "B"); ws.cell(3, 3, "SKU-B"); ws.cell(3, 4, "5903018666495")   # same EAN, different SKU
+    ws.cell(4, 1, "C"); ws.cell(4, 3, "SKU-C"); ws.cell(4, 4, "1234567890123")   # bad check digit
+    os.makedirs("/tmp/th", exist_ok=True); wb.save("/tmp/th/ean.xlsx")
+    schema = {"tabs": {"Mice": {"roles": {"title": 1, "spec_start": 2, "spec_end": 2, "sku": 3, "ean": 4},
+                                "labels": {}, "header_row": 1, "first_data_row": 2, "example_rows": []}}}
+    ledger.save("/tmp/th/led.json", [])
+    F = audit.audit("/tmp/th/ean.xlsx", schema, "/tmp/th/led.json", "/tmp/th/rep.md", profiles={})
+    msgs = " ".join(m for *_, m in F)
+    check("ean: shared barcode across different SKUs flagged", "shared across different SKUs" in msgs, msgs[:160])
+    check("ean: invalid check digit flagged", "not a valid barcode" in msgs)
+    check("ean: a valid EAN-13 is accepted", "5903018666495' is not a valid" not in msgs)
+
+
+# --- Excel formatting pass (W6) ---------------------------------------------
+def test_format_xlsx():
+    import format_xlsx as FX
+    from openpyxl import load_workbook
+    wb = Workbook(); ws = wb.active; ws.title = "Chairs"
+    ws.cell(1, 1, "Title"); ws.cell(1, 2, "What's in the Box"); ws.cell(1, 3, "Seat depth")
+    ws.cell(2, 1, "Chair"); ws.cell(2, 2, "1 x Chair"); ws.cell(2, 3, "520mm")
+    os.makedirs("/tmp/th", exist_ok=True); p = "/tmp/th/fmt.xlsx"; wb.save(p)
+    FX.format_workbook(p)
+    s = load_workbook(p)["Chairs"]
+    check("format: row height 30",
+          s.row_dimensions[1].height == 30 and s.row_dimensions[2].height == 30)
+    check("format: A & B = 45, others = 16",
+          round(s.column_dimensions["A"].width) == 45 and round(s.column_dimensions["B"].width) == 45
+          and round(s.column_dimensions["C"].width) == 16)
+    check("format: header centred+bold, body left, all wrap+middle",
+          s.cell(1, 1).alignment.horizontal == "center" and s.cell(1, 1).font.bold
+          and s.cell(2, 1).alignment.horizontal == "left"
+          and s.cell(2, 1).alignment.vertical == "center" and s.cell(2, 1).alignment.wrap_text)
+    check("format: thin borders across the data range",
+          s.cell(2, 3).border.left.style == "thin" and s.cell(2, 3).border.bottom.style == "thin")
+
+
+# --- derivation with provenance (W3) ----------------------------------------
+def test_derive():
+    import derive, ledger
+    import confidence as C
+    c = derive.colour_from_title("Oppo A40 (Sparkle Black, 128 GB)")
+    check("derive: colour pulled from title", c is not None and "black" in c[0].lower(), str(c))
+    check("derive: no colour word in title -> abstain",
+          derive.colour_from_title("Endorfy Meta BK Ergonomic Gaming Chair") is None)
+    h = derive.height_from_dimensions("1300 x 690 x 640mm", "HWL")
+    check("derive: total height = published H axis (not guessed)", h is not None and h[0] == "1300mm", str(h))
+    check("derive: refuses to pick a height without a published axis order",
+          derive.height_from_dimensions("1300 x 690 x 640mm", "") is None)
+    e = derive.make_entry("Chairs", 2, 30, "Total height", "1300mm", h[1])
+    check("derive: derived entry validates (provenance + note)", ledger.validate([e]) == [], str(ledger.validate([e])))
+    check("derive: derived entry scored 70 and eligible", C.score_entry(e)[0] == 70 and C.eligible(e))
+
+
+# --- house style guide + charset (W5) ---------------------------------------
+def test_standardise_style():
+    import standardise as S
+    f = lambda h, v: S.standardise_value(h, v)[0]
+    check("style: weight no space", f("Product weight:", "23.3 kg") == "23.3kg")
+    check("style: lone dimension no space", f("Seat depth:", "520 mm") == "520mm")
+    check("style: dimension triple, x spaced, unit attached to last",
+          f("Product dimensions:", "1300 × 690 × 640 mm") == "1300 x 690 x 640mm")
+    check("style: cm triple scaled to mm",
+          f("Packaging dimensions:", "76 x 63.5 x 37.5 cm") == "760 x 635 x 375mm")
+    check("style: angle range spelled out, + dropped",
+          f("Backrest incline:", "100° to 125°") == "100 to 125 degrees")
+    check("style: signed angle range, + dropped, - kept",
+          f("Max seat tilting angle:", "-90° to +90°") == "-90 to 90 degrees")
+    check("style: temperature spelled out with Celsius",
+          f("Operating temperature:", "-10 °C / 40 °C") == "-10 to 40 degrees Celsius")
+    check("style: multiplication sign becomes x",
+          "×" not in f("Wheels:", "2 × 60 mm caster"))
+    check("style: smart quotes straightened",
+          f("Bearing type:", "the “big” one") == 'the "big" one')
+    check("style: prose quantity spacing 1x -> 1 x",
+          f("What's in the Box:", "1x Chair, 1x Assembly kit") == "1 x Chair, 1 x Assembly kit")
+    check("style: prose keeps pack dimensions intact (no numeric reformat)",
+          "120mm" in f("What's in the Box:", "2x 120mm fan"))
+    check("style: network '4G'/'5G' not mangled into grams",
+          f("Network:", "4G") == "4G" and f("Network:", "4G LTE") == "4G LTE")
+    check("style: real weight still normalises (lowercase g)", f("Weight:", "200 g") == "200g")
+    check("style: warranty month spacing/casing", f("Warranty:", "12months") == "12 months"
+          and f("Warranty:", "12 Months") == "12 months")
+    # socket-style noise is FLAGGED, not auto-changed
+    wb = Workbook(); ws = wb.active; ws.title = "Coolers"
+    for c, hh in enumerate(["Title", "Socket compatibility:", "SKU:"], 1):
+        ws.cell(1, c, hh)
+    ws.cell(2, 1, "Cooler"); ws.cell(2, 2, "AM3(+), AM2(+)"); ws.cell(2, 3, "X1")
+    os.makedirs("/tmp/th", exist_ok=True); p = "/tmp/th/style.xlsx"; wb.save(p)
+    fixes, flags = S.check(p)
+    check("style: socket-noise '(+)' flagged, not auto-stripped",
+          any("socket" in fl.get("why", "") for fl in flags)
+          and not any(fx["col"].strip() == "Socket compatibility:" for fx in fixes))
+
+
 def main():
     for fn in [test_engine_fixtures, test_engine_guards, test_conflicts, test_ledger_validate,
                test_profile_builder, test_linkcheck_offline, test_duplicate_sku,
                test_jobspec, test_schema_store, test_runner, test_primary_source,
                test_confidence, test_fields, test_hide_blank_columns,
-               test_from_spec_table, test_completeness, test_match]:
+               test_from_spec_table, test_completeness, test_match, test_answer_kind,
+               test_fields_semantic, test_standardise_style, test_format_xlsx, test_derive,
+               test_completeness_lone, test_ean_integrity, test_delivery, test_consolidate,
+               test_column_coverage]:
         try:
             fn()
         except Exception as ex:  # noqa
