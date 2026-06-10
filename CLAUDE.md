@@ -82,7 +82,7 @@ A real example we traced: a chair's recline value sitting in the "Max seat tilti
 - Brand and product agnostic. Field sets are inferred from the source and confirmed, never hard-coded.
 - Provenance and confidence travel with the data.
 - Nothing from model memory. Product facts are sourced fresh every time.
-- No absence without a search. A blank narrated as "absent" or "unpublished" must cite the attempt, exactly as a value cites its source. A never-attempted blank is an unknown to chase, not a sourced negative — and the sourcing scope is derived from the target schema, never hand-listed, so no column is silently dropped.
+- No absence without a search. A blank narrated as "absent" or "unpublished" must cite the attempt, exactly as a value cites its source. A never-attempted blank is an unknown to chase, not a sourced negative — and the sourcing scope is derived from the target schema, never hand-listed, so no column is silently dropped. Enforced symmetrically: a `deferred` record (vendor-only / unsourceable) requires a `search_receipt` as a value requires a `source_url`, and the closure gate (§9) blocks any blank that is neither filled nor receipted.
 
 ---
 
@@ -177,6 +177,7 @@ Run at the end of a job, re-deriving rather than trusting the build:
 - Governance: every row carries provenance and confidence in the ledger.
 - Gate re-run: completeness and standardise come back clean.
 - Column coverage (the 2026-06-10 escapes): no target column empty across every product, and no row blank on a column its siblings fill — unless it is a sourced-absent with evidence or a structural blank (a pre-listing TSIN). `completeness.column_coverage`. The gate refuses to let an empty pass silently; it forces fill, evidence, or justification.
+- Closure — the symmetric twin of "no value without a source": every blank target cell is closed, by a value, a sourced `absent` ("No"), or a `deferred` record carrying a `search_receipt` (we tried, it is vendor-only / not public). A blank with no closing record is `unknown` and unresolved; it may not ship, and it may not be called absent/unpublished/vendor-only, without a recorded search. `completeness.coverage_closure`. This closes the leak where a negative was asserted by reasoning instead of evidence — my own "we can't get this" is a claim, not a fact, until a search proves it.
 
 Proven shape from the Endorfy job: 67 SKUs, 1606 source values, zero lost, zero misplaced.
 

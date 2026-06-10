@@ -44,3 +44,13 @@ its vendor request, justified, not hidden.
 Both escapes were the *same* failure in different fields, and both were caught by a human. That is the
 definition of a missing gate. The cost model is unforgiving — $3.99 per failed product — and a blank we
 could have filled fails the product as surely as a wrong value. The gate now holds that line.
+
+## Update (2026-06-10, later) — the symmetric enforcement
+It happened twice more (Xiaomi identity, then package — both sourceable from mi.com). The column-coverage
+gate flagged them, but I overrode the flag with prose ("vendor-only") — because a *value* needs a source
+while a *negative* needed nothing. That asymmetry was the real leak. Closed it: a `deferred` record (we
+tried, it is vendor-only / unsourceable) now requires a `search_receipt` — the searches that came back
+empty — exactly as a value requires a `source_url`; and `completeness.coverage_closure` is a delivery gate
+that blocks any blank cell that is neither filled nor closed by a sourced `absent` or a receipted
+`deferred`. A negative can no longer be asserted by reasoning alone. Suite: 130 green. The fuller reflex
+(the gate auto-running the search on each flag) still awaits the schema-driven build + a fetch-cache.

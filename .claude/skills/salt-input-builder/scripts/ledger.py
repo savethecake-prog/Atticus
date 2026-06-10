@@ -44,6 +44,22 @@ def validate(entries):
     seen = {}
     for i, e in enumerate(entries):
         tag = f"entry#{i} ({e.get('tab')} r{e.get('row')} {e.get('field')})"
+        if e.get("answer_kind") == "deferred":
+            # The receipt of a FAILED search: the value exists but we could not source
+            # it, so the cell is left blank WITH evidence of the attempt. It is a record,
+            # not a value (no value/provenance), but a search_receipt is mandatory - the
+            # symmetric twin of "no value without a source".
+            for k in ("tab", "row", "field", "column"):
+                if e.get(k) in (None, ""):
+                    v.append(f"{tag}: deferred record missing required field '{k}'")
+            if not e.get("search_receipt"):
+                v.append(f"{tag}: 'deferred' answer needs a 'search_receipt' (the searches that came back empty)")
+            key = (e.get("tab"), e.get("row"), e.get("column"))
+            if key in seen:
+                v.append(f"{tag}: duplicate target cell, already recorded by entry#{seen[key]}")
+            elif None not in key:
+                seen[key] = i
+            continue
         for k in REQUIRED:
             if e.get(k) in (None, ""):
                 v.append(f"{tag}: missing required field '{k}'")

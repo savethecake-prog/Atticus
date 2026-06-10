@@ -134,6 +134,47 @@ def column_coverage(built_path, schema, mostly=0.5, default_structural=("tsin",)
     return findings
 
 
+def coverage_closure(built_path, schema, entries, default_structural=("tsin",)):
+    """Delivery gate - the symmetric twin of "no value without a source".
+
+    Every blank target cell must be CLOSED: by a value, by a sourced 'absent' (a "No"
+    justified by the complete table), or by a 'deferred' record carrying a search
+    receipt (we tried, it is vendor-only / not public). A blank with no closing record
+    is 'unknown' and UNRESOLVED - it may not ship, and it may not be declared
+    absent/unpublished/vendor-only, without a recorded search. This closes the leak
+    where a negative claim was made by reasoning instead of evidence. Structural blanks
+    (a pre-listing TSIN) are exempt. Returns findings for unresolved blanks.
+    """
+    import re
+    nk = lambda s: re.sub(r"[^a-z0-9]", "", str(s or "").lower())
+    closed = {(e.get("tab"), e.get("row"), e.get("column"))
+              for e in entries if e.get("answer_kind") in ("absent", "deferred")}
+    wb = load_workbook(built_path, read_only=True, data_only=True)
+    findings = []
+    for tab in [t for t in schema.get("tabs", {}) if t in wb.sheetnames]:
+        ws = wb[tab]
+        t = schema["tabs"][tab]
+        struct = set(default_structural) | {nk(s) for s in (t.get("gap_classes", {}) or {}).get("structural_blank", ())}
+        titlec = t.get("roles", {}).get("title", 1)
+        first = t.get("first_data_row", 2)
+        examples = set(t.get("example_rows", []))
+        headers = {c: str(ws.cell(1, c).value or "") for c in range(1, ws.max_column + 1) if ws.cell(1, c).value}
+        for r in range(first, ws.max_row + 1):
+            tv = ws.cell(r, titlec).value
+            if r in examples or tv in (None, "") or str(tv).strip().lower().startswith("example"):
+                continue
+            for c, h in headers.items():
+                if nk(h) in struct:
+                    continue
+                if ws.cell(r, c).value in (None, "") and (tab, r, c) not in closed:
+                    findings.append({"tab": tab, "row": r, "col": h, "kind": "unresolved-blank",
+                                     "why": f"'{h}' is blank with no closing record - fill it, or record a "
+                                            f"sourced 'absent' (No) or a 'deferred' with a search receipt; "
+                                            f"a blank cannot be declared absent/vendor-only without a search"})
+    wb.close()
+    return findings
+
+
 def summarise(findings):
     rows = [f for f in findings if f["row"]]
     tabsf = [f for f in findings if f["row"] is None]

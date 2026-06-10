@@ -22,10 +22,14 @@ WEB_TIERS = ("manufacturer", "retailer")  # these require url + snippet
 #            table, so the honest answer is "No". Its basis is a note + the page
 #            that shows the full table, NOT a positive snippet. Scored high unless
 #            the table's completeness is itself uncertain.
-#   unknown= genuinely unpublished. Carries NO ledger entry at all; the cell is
-#            left blank and the field goes to the needs-you chase queue. (Listed
-#            for completeness; the build never writes a marker string into a cell.)
-ANSWER_KINDS = ("value", "absent", "unknown")
+#   unknown= NOT yet attempted. Carries no ledger entry; the cell is blank and the
+#            field is in the needs-you chase queue. This is NOT a terminal state -
+#            it may not ship, nor be called "absent".
+#   deferred= the value EXISTS but we could not source it (vendor master / not public).
+#            The cell stays blank, but a 'search_receipt' records the searches that came
+#            back empty - the symmetric twin of "no value without a source". A 'deferred'
+#            with no receipt is rejected; this is how an unknown is closed honestly.
+ANSWER_KINDS = ("value", "absent", "unknown", "deferred")
 
 # Default confidence colours (fill, font). Override via job spec.
 DEFAULT_COLOURS = {

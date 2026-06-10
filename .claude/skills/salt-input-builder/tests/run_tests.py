@@ -516,6 +516,30 @@ def test_column_coverage():
     os.remove(path)
 
 
+def test_receipt_closure():
+    # the symmetric twin of "no value without a source": a negative needs a receipt
+    bad = {"tab": "Specs", "row": 2, "field": "SKU", "column": 3, "answer_kind": "deferred"}
+    check("receipt: a 'deferred' with no search_receipt is rejected",
+          any("search_receipt" in v for v in ledger.validate([bad])))
+    good = {"tab": "Specs", "row": 2, "field": "SKU", "column": 3, "answer_kind": "deferred",
+            "search_receipt": "searched mi.com, gsmarena, takealot - SKU not public; distributor master"}
+    check("receipt: a 'deferred' WITH a search_receipt validates", ledger.validate([good]) == [], str(ledger.validate([good])))
+    import completeness
+    wb = Workbook(); ws = wb.active; ws.title = "Specs"
+    for c, h in enumerate(["Model", "Processor", "SKU", "TSIN"], 1):
+        ws.cell(1, c, h)
+    ws.append(["P1", "SD", "", ""])   # SKU blank (must be closed), TSIN blank (structural, exempt)
+    os.makedirs("/tmp/th", exist_ok=True); p = "/tmp/th/closure.xlsx"; wb.save(p)
+    schema = {"tabs": {"Specs": {"roles": {"title": 1}, "header_row": 1, "first_data_row": 2,
+                                 "example_rows": [], "gap_classes": {"structural_blank": ["TSIN"]}}}}
+    cols = {x["col"] for x in completeness.coverage_closure(p, schema, [])}
+    check("receipt: a blank with no closing record is unresolved", "SKU" in cols, str(cols))
+    check("receipt: a structural blank (TSIN) is exempt from closure", "TSIN" not in cols)
+    closed = {x["col"] for x in completeness.coverage_closure(p, schema, [good])}
+    check("receipt: a receipted 'deferred' closes the blank (no longer unresolved)", "SKU" not in closed, str(closed))
+    os.remove(p)
+
+
 def test_ean_integrity():
     import audit
     wb = Workbook(); ws = wb.active; ws.title = "Mice"
@@ -624,7 +648,7 @@ def main():
                test_from_spec_table, test_completeness, test_match, test_answer_kind,
                test_fields_semantic, test_standardise_style, test_format_xlsx, test_derive,
                test_completeness_lone, test_ean_integrity, test_delivery, test_consolidate,
-               test_column_coverage]:
+               test_column_coverage, test_receipt_closure]:
         try:
             fn()
         except Exception as ex:  # noqa

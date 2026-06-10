@@ -109,6 +109,8 @@ def build(template, schema, ledger_path, out_path, colours=None, check_links=Tru
         concat_col = schema["tabs"][e["tab"]]["roles"].get("concat")
         if col == concat_col:
             continue
+        if e.get("answer_kind") in ("deferred", "unknown"):
+            continue  # a record of a failed search, not a value - the cell stays blank
         # write every sourced value; weak ones are flagged, not blanked
         common.write_cell(ws, e["row"], col, e["value"])
         common.set_fill(ws, e["row"], col, colours[band_key[e["band"]]]["fill"])
