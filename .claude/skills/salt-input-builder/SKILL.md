@@ -48,7 +48,12 @@ A brand- and product-agnostic core plus category profiles built per job.
   (`delivery.py`, analysis columns stripped, dead columns dropped); tranche
   consolidation into one tab per category (`consolidate.py`); and EAN format +
   uniqueness at audit. The marker string "Not specified" is retired: unknowns are
-  blank in delivery and chased via the needs-you queue.
+  blank in delivery and chased via the needs-you queue. Coverage closure
+  (`completeness.coverage_closure`) plus the closure reflex (`closure.py`: brief ->
+  source -> merge -> receipt, identity deferred to the master not web-asserted) enforce
+  "no negative without a search": a blank may not ship, nor be declared absent/vendor-only,
+  without a recorded search receipt; `delivery.make_delivery` refuses otherwise. See the
+  closure reflex in `references/workflow.md`.
 - Category profiles: the data semantics for a category (metric ranges, identifier
   decoders, cross-field rules) are NOT shipped with the skill. They are built per
   job by inspecting the actual product and category data, confirmed by the user,

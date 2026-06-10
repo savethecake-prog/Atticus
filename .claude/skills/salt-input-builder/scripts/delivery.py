@@ -22,9 +22,24 @@ def _is_analysis(header):
     return any(k in h for k in _ANALYSIS)
 
 
-def make_delivery(src, out_path, drop_hidden=True):
+def make_delivery(src, out_path, schema=None, entries=None, drop_hidden=True):
     """Write a clean delivery copy of src: remove analysis columns and sheets, drop
-    hidden (all-blank) columns, apply the house format. Returns out_path."""
+    hidden (all-blank) columns, apply the house format. Returns out_path.
+
+    Enforcement: if a schema is supplied, delivery REFUSES (raises) when
+    completeness.coverage_closure finds an unresolved blank - a cell that is neither
+    filled, sourced-absent, nor a receipted deferred. A blank may not ship, nor be
+    declared absent/vendor-only, without a recorded search. (build.py refuses on a
+    dirty ledger; this is the same wall at the delivery boundary.)"""
+    if schema is not None:
+        import completeness
+        unresolved = completeness.coverage_closure(src, schema, entries or [])
+        if unresolved:
+            u = unresolved[0]
+            raise ValueError(
+                f"delivery refused: {len(unresolved)} unresolved blank(s) - fill, record a sourced "
+                f"'absent' (No), or receipt as a 'deferred' with a search receipt before delivery. "
+                f"First: {u['tab']} r{u['row']} '{u['col']}'")
     wb = load_workbook(src)
     for name in list(wb.sheetnames):
         if name.strip().lower() in _ANALYSIS_SHEETS:

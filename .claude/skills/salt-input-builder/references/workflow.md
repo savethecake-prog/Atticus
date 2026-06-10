@@ -103,3 +103,34 @@ is empty, run straight through to delivery.
 
 Everything else (a clear single manufacturer source; a retailer that agrees and
 matches identity when fallback is allowed) proceeds without interruption.
+
+## Closure reflex (run before any "absent" is narrated)
+
+A blank may not ship, nor be called absent/unpublished/vendor-only, without a recorded
+search. Run this loop until the closure gate is clean: the search runs first, and what it
+cannot fill is closed with a receipt of the attempt. This removes the "is it available?"
+judgement from the orchestrator — the step that escaped four times on 2026-06-10.
+
+1. **Gate.** `completeness.coverage_closure(workbook, schema, ledger)` lists every blank
+   target cell not closed by a value, a sourced `absent`, or a receipted `deferred`.
+   Structural blanks (a pre-listing TSIN) are exempt.
+2. **Brief.** `closure.sourcing_brief(...)` turns that list into a per-product task list,
+   derived from the gate (so no column is hand-dropped). Each gap splits: spec fields to
+   `auto_source`; identity (barcode/SKU/TSIN/model number) and region-variable fields to
+   `defer` — NEVER web-asserted (the GEX750 discipline). Human-in-the-loop is preserved
+   here by construction.
+3. **Source.** One sourcer per gap-product (manufacturer / source-tier first), fed the
+   product's identity and its `auto_source` fields. This fan-out is the orchestrator's.
+4. **Merge.** `closure.merge_sourced(...)` fills the blanks by model number (variant-safe),
+   standardised, never overriding a filled cell.
+5. **Re-gate, then receipt.** Run the gate again. For every cell still empty,
+   `closure.receipt_residue(...)` writes a `deferred` entry carrying the search receipt
+   (the searches that came back empty, or the defer reason for an identity field). A
+   residue with no receipt cannot ship.
+6. **Deliver.** `delivery.make_delivery(src, out, schema, ledger)` REFUSES while any blank
+   is unresolved. The genuine human calls (which variant, which identity, source conflicts)
+   go to the one needs-you review — never the rote "did we even look".
+
+The deterministic spine (gate, brief, merge, receipt, refusal) is built and tested. A
+fetch-cache + per-host throttle is a scale optimisation (thousands of products), deferred
+until scale demands it.

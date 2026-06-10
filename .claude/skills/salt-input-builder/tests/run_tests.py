@@ -540,6 +540,45 @@ def test_receipt_closure():
     os.remove(p)
 
 
+def test_closure_reflex():
+    import closure, completeness, delivery, ledger
+    from openpyxl import load_workbook
+    wb = Workbook(); ws = wb.active; ws.title = "Specs"
+    for c, h in enumerate(["Model", "Model number", "Processor", "SKU", "TSIN"], 1):
+        ws.cell(1, c, h)
+    ws.append(["P1", "M-1", "", "", ""])   # Processor blank (spec->auto), SKU blank (identity->defer), TSIN structural
+    os.makedirs("/tmp/th", exist_ok=True); p = "/tmp/th/reflex.xlsx"; wb.save(p)
+    schema = {"tabs": {"Specs": {"roles": {"title": 1}, "header_row": 1, "first_data_row": 2,
+                                 "example_rows": [], "gap_classes": {"structural_blank": ["TSIN"]}}}}
+    findings = completeness.coverage_closure(p, schema, [])
+    cols = {x["col"] for x in findings}
+    check("reflex/gate: Processor & SKU unresolved, TSIN exempt",
+          {"Processor", "SKU"} <= cols and "TSIN" not in cols, str(cols))
+    briefs = closure.sourcing_brief(p, schema, findings)
+    b = briefs[("Specs", 2)]
+    check("reflex/brief: spec field is auto-sourced", "Processor" in b["auto_source"])
+    check("reflex/brief: identity (SKU) is DEFERRED, never web-sourced (human-in-the-loop)",
+          any(f == "SKU" for f, _ in b["defer"]) and "SKU" not in b["auto_source"])
+    check("reflex/brief: product identity captured for the search", b["identity"].get("Model number") == "M-1")
+    n = closure.merge_sourced(p, {"M-1": {"Processor": {"value": "Helio G99"}}}, schema)
+    check("reflex/merge: spec value filled by model number (variant-safe)",
+          n == 1 and load_workbook(p)["Specs"].cell(2, 3).value == "Helio G99")
+    findings2 = completeness.coverage_closure(p, schema, [])
+    receipts = {("Specs", 2, f["column"]): "no master; vendor confirm" for f in findings2}
+    entries, unreceipted = closure.receipt_residue(findings2, receipts)
+    check("reflex/receipt: residue closed (none unreceipted)", not unreceipted, str(unreceipted))
+    check("reflex/receipt: deferred entries validate", ledger.validate(entries) == [], str(ledger.validate(entries)))
+    try:
+        delivery.make_delivery(p, "/tmp/th/reflex_del.xlsx", schema=schema, entries=[]); refused = False
+    except ValueError:
+        refused = True
+    check("reflex/delivery: REFUSES to ship an unresolved blank", refused)
+    delivery.make_delivery(p, "/tmp/th/reflex_del.xlsx", schema=schema, entries=entries)
+    check("reflex/delivery: ships once the blank is receipted as deferred",
+          os.path.exists("/tmp/th/reflex_del.xlsx"))
+    os.remove(p)
+
+
 def test_ean_integrity():
     import audit
     wb = Workbook(); ws = wb.active; ws.title = "Mice"
@@ -648,7 +687,7 @@ def main():
                test_from_spec_table, test_completeness, test_match, test_answer_kind,
                test_fields_semantic, test_standardise_style, test_format_xlsx, test_derive,
                test_completeness_lone, test_ean_integrity, test_delivery, test_consolidate,
-               test_column_coverage, test_receipt_closure]:
+               test_column_coverage, test_receipt_closure, test_closure_reflex]:
         try:
             fn()
         except Exception as ex:  # noqa

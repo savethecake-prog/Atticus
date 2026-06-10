@@ -167,7 +167,7 @@ def coverage_closure(built_path, schema, entries, default_structural=("tsin",)):
                 if nk(h) in struct:
                     continue
                 if ws.cell(r, c).value in (None, "") and (tab, r, c) not in closed:
-                    findings.append({"tab": tab, "row": r, "col": h, "kind": "unresolved-blank",
+                    findings.append({"tab": tab, "row": r, "col": h, "column": c, "kind": "unresolved-blank",
                                      "why": f"'{h}' is blank with no closing record - fill it, or record a "
                                             f"sourced 'absent' (No) or a 'deferred' with a search receipt; "
                                             f"a blank cannot be declared absent/vendor-only without a search"})
