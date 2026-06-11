@@ -87,14 +87,14 @@ _SCALE_DIM = re.compile(r"(product|packaging)\s*dimension", re.I)
 # fields (e.g. storage speeds) keep their commas, so this is keyed to contrast.
 _CONTRAST = re.compile(r"contrast", re.I)
 _THOUSANDS = re.compile(r"(?<=\d),(?=\d)")
-_WT = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*([kK][gG]|g)\b")  # 'g' lowercase only: "4G"/"5G" network is not grams
+_WT = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*([kK][gG]|g)(?![/A-Za-z²³])")  # not g/cm³, grams, 4G
 # compact the space between a number and an attached unit, for machine-readable
 # ingestion (Christopher's compact rule). A closed whitelist of units only, so
 # natural-language ("8 megapixel", "Up to 4") is never touched. cd/m² last so the
 # slash/superscript survive intact.
 _UNIT_COMPACT = re.compile(
     r"(?<![A-Za-z0-9])(\d+(?:[.,]\d+)?)\s+("
-    r"GHz|MHz|kHz|KHz|Hz|Gbps|Mbps|GB/s|MB/s|TB|GB|MB|KB|mAh|nm|ms|DPI|dpi|cd/m²|W"
+    r"g/cm³|g/cm3|GHz|MHz|kHz|KHz|Hz|Gbps|Mbps|GB/s|MB/s|TB|GB|MB|KB|mAh|nm|ms|DPI|dpi|cd/m²|W"
     r")(?![A-Za-z])", re.I)
 _MONTHS = re.compile(r"\b(\d+)\s*[Mm]onths\b")                     # "12months"/"12 Months" -> "12 months"
 # temperatures carry a Celsius unit; angles carry a bare degree sign. Both spelled out.
