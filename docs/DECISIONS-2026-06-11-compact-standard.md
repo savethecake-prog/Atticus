@@ -65,6 +65,27 @@ Schema-driven, field-keyed validator built from the vendored workbook.
   `data_type` to drive these; the standardiser does not yet consult the table for
   per-field units. Wire when the tester/standardiser loop is built in Stage 3.
 
+## Stage 3 — DONE (branch: claude/writer-tester-auditor-stage3)
+Writer / tester / auditor restructure (Decision C).
+- `auditor.md`: stripped the `Write` tool — the tester now holds no write capability,
+  flags but never edits a value. Prompt rewritten: it runs the Python harness
+  (completeness, standardise, schema_spec via audit.py), interprets, and feeds
+  findings back; the builder fixes.
+- `builder.md`: the writer never tests; on feedback it changes only the named cells
+  and leaves the rest byte-for-byte/verbatim.
+- `reporter.md`: the final synthesiser — one consolidated, Excel-exportable gap
+  report (found-but-unconfirmed + cannot-find), batched per tranche, never a scatter.
+- `audit.py`: wired `schema_spec` into the harness as report-only SCHEMA findings
+  (no shading — the auditor never mutates values); new audit report section.
+- CLAUDE.md: codified the writer/tester division and the byte-for-byte convention;
+  refreshed the stale "60 tests" reference. Suite 163 → 165.
+
+### Still open (smaller, for a later pass)
+- `audit.py` still saves shading/notes into the production workbook in place; the
+  annotations are value-preserving (never overwrite a value) but a stricter reading
+  of "the tester never writes" would route them to a separate annotated copy.
+  Flagged, not changed — would touch the audit test contract.
+
 ## Flagged to Christopher (not silently absorbed)
 - Schema DB row 17 labels dimensions "in centimetres (mm)" — contradictory; unit is mm.
 - Examples rows 286–301 (coolers, case fans) carry field names only — no rules yet.

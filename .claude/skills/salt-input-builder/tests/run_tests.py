@@ -140,6 +140,27 @@ def test_duplicate_sku():
           any("duplicate SKU" in m for *_, m in findings))
 
 
+# --- audit runs the schema validator as part of the harness (Stage 3) --------
+def test_audit_schema_conformance():
+    import audit
+    wb = Workbook(); ws = wb.active; ws.title = "GPUs"
+    for c, h in {1: "Title", 2: "Ray Tracing Support", 3: "SKU"}.items():
+        ws.cell(1, c, h)
+    ws.cell(2, 1, "Card A"); ws.cell(2, 2, "Maybe"); ws.cell(2, 3, "GPU-1")  # not Yes/No
+    os.makedirs("/tmp/th", exist_ok=True); wb.save("/tmp/th/wbs.xlsx")
+    schema = {"tabs": {"GPUs": {"roles": {"title": 1, "spec_start": 2, "spec_end": 2, "sku": 3},
+                                "labels": {}, "header_row": 1, "first_data_row": 2, "example_rows": []}}}
+    ledger.save("/tmp/th/leds.json", [])
+    findings = audit.audit("/tmp/th/wbs.xlsx", schema, "/tmp/th/leds.json", "/tmp/th/reps.md", profiles={})
+    check("audit: schema single-select violation surfaced as SCHEMA finding",
+          any(sev == "SCHEMA" and "single_select" in m for *_, sev, m in
+              [(f[0], f[1], f[2], f[3], f[4]) for f in findings]))
+    # the auditor flags but never edits the value (the writer fixes)
+    from openpyxl import load_workbook as _lw
+    check("audit: schema violation value left intact (auditor never rewrites)",
+          _lw("/tmp/th/wbs.xlsx")["GPUs"].cell(2, 2).value == "Maybe")
+
+
 def test_jobspec():
     import jobspec
     good = {"job": {"name": "B1", "template": "t.xlsx", "output_dir": "out"},
@@ -742,7 +763,7 @@ def main():
                test_fields_semantic, test_standardise_style, test_format_xlsx, test_derive,
                test_completeness_lone, test_ean_integrity, test_delivery, test_consolidate,
                test_column_coverage, test_receipt_closure, test_closure_reflex,
-               test_schema_spec]:
+               test_schema_spec, test_audit_schema_conformance]:
         try:
             fn()
         except Exception as ex:  # noqa
