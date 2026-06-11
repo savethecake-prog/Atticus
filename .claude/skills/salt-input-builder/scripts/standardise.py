@@ -27,10 +27,25 @@ from openpyxl import load_workbook
 
 # ---- canonical configuration -------------------------------------------------
 
-# columns whose VALUES must never be reformatted (identifiers and plumbing)
+# columns whose VALUES must never be reformatted (identifiers and plumbing).
+# NB: "image"/"video" are NOT bare substrings here — they collided with spec
+# fields like "Video memory capacity" / "Video base clock", which were then
+# silently skipped from compaction. Media columns are matched by _is_media().
 SKIP_VALUE = ("sku", "ean", "tsin", "barcode", "model number", "model code",
               "product code", "source", "confidence", "check", "status",
-              "pl2", "rrp", "qty", "image", "video", "title")
+              "pl2", "rrp", "qty", "title")
+
+# media-link columns (their URLs must never be reformatted), matched precisely so
+# a spec field that merely starts with "Video"/"Image" is not caught.
+_MEDIA_EXACT = {"image", "images", "video", "videos", "imageurl", "imageurls",
+                "videourl", "videourls", "mainimage", "additionalimages",
+                "media", "mediaurl"}
+def _is_media(header):
+    k = re.sub(r"[^a-z0-9]", "", header.lower())
+    if k in _MEDIA_EXACT:
+        return True
+    return bool(re.search(r"image|video", header, re.I)
+                and re.search(r"url|link|path|src", header, re.I))
 
 # prose columns: only spelling is normalised, never numeric reformatting
 PROSE = ("what", "in the box", "why", "description", "feature", "subtitle", "note")
@@ -171,7 +186,7 @@ def standardise_value(header, value):
     if value is None or not isinstance(value, str):
         return value, []
     h = header.lower()
-    if any(k in h for k in SKIP_VALUE):
+    if _is_media(header) or any(k in h for k in SKIP_VALUE):
         return value, []
     # prose cells (What's in the Box, features, descriptions): charset + quantity
     # spacing + spelling only; never numeric reformatting ("2 x 120mm" is a quantity).

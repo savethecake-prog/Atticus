@@ -43,7 +43,14 @@ A brand- and product-agnostic core plus category profiles built per job.
   duplicate; a synonym of a client-owned required field is dropped); the three-state
   answer model (`answer_kind` value / `absent` "No" / unknown-blank, in `ledger`,
   `confidence`, and the gap taxonomy in `runner.needs_you`); derivation with
-  provenance (`derive.py`); the house style guide and ASCII charset (`standardise.py`);
+  provenance (`derive.py`); the house style guide and ASCII charset, compacting
+  measurements to one machine-readable chunk for SALT ingestion (`standardise.py`);
+  the field-keyed schema validator (`schema_spec.py`, reading the rules table
+  `references/schema/schema_rules.json` built from Christopher's workbook by
+  `build_schema_rules.py`) — it checks each mapped cell against its field's
+  char-length, single-select, compaction, required-glyph, banned-token and
+  apostrophe rules and reports violations, never rewriting (the tester validates,
+  it does not write);
   the Excel-formatting pass (`format_xlsx.py`); the clean delivery copy
   (`delivery.py`, analysis columns stripped, dead columns dropped); tranche
   consolidation into one tab per category (`consolidate.py`); and EAN format +
