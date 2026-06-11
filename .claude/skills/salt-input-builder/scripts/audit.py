@@ -158,9 +158,32 @@ def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=No
     for tab, row, col, field, sev, msg in L.detect_conflicts(entries):
         F(tab, row, [col] if col else [], sev, msg)
 
-    # apply flags to the workbook
+    # H. schema conformance (Christopher's field-keyed rules). Report-only: these
+    # are formatting/standard violations, surfaced for the writer to fix; the
+    # auditor never edits a value, so schema findings are NOT shaded into cells.
+    try:
+        import schema_spec
+        _sch = schema_spec.load()
+    except Exception:
+        _sch = None
+    if _sch is not None:
+        for tab, t in schema["tabs"].items():
+            if tab not in wb.sheetnames:
+                continue
+            ws = wb[tab]; roles = t["roles"]
+            for r in range(t["first_data_row"], ws.max_row + 1):
+                if r in t.get("example_rows", []) or ws.cell(r, roles.get("title", 1)).value in (None, ""):
+                    continue
+                for c in range(1, ws.max_column + 1):
+                    hdr = str(ws.cell(1, c).value or "")
+                    for v in _sch.validate_value(hdr, ws.cell(r, c).value):
+                        F(tab, r, [c], "SCHEMA", f"{v['rule']}: {v['why']} (field '{v['field_name']}')")
+
+    # apply flags to the workbook (SCHEMA findings are report-only, never shaded)
     grouped = {}
     for tab, row, cols, sev, msg in findings:
+        if sev == "SCHEMA":
+            continue
         g = grouped.setdefault((tab, row), {"cols": set(), "msgs": []})
         g["cols"].update(cols)
         g["msgs"].append(f"[{sev}] {msg}")
@@ -180,7 +203,7 @@ def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=No
 
     wb.save(built_path)
     _report(out_report, findings, today)
-    sev_counts = {s: sum(1 for f in findings if f[3] == s) for s in ("HARD", "SOFT")}
+    sev_counts = {s: sum(1 for f in findings if f[3] == s) for s in ("HARD", "SOFT", "SCHEMA")}
     print(f"AUDIT done: {len(findings)} findings {sev_counts} -> {out_report}")
     return findings
 
@@ -189,12 +212,15 @@ def _report(path, findings, today):
     lines = [f"# Audit report ({today})", ""]
     hard = [f for f in findings if f[3] == "HARD"]
     soft = [f for f in findings if f[3] == "SOFT"]
-    lines += [f"- HARD findings: {len(hard)}", f"- SOFT findings: {len(soft)}", ""]
+    schema = [f for f in findings if f[3] == "SCHEMA"]
+    lines += [f"- HARD findings: {len(hard)}", f"- SOFT findings: {len(soft)}",
+              f"- SCHEMA findings: {len(schema)}", ""]
     if not findings:
         lines.append("No discrepancies found. Every populated cell traces to a ledger entry, "
                      "every manufacturer/retailer value is supported by its snippet, colours match "
                      "tiers, and all source links resolve.")
-    for label, group in (("Hard findings", hard), ("Soft findings", soft)):
+    for label, group in (("Hard findings", hard), ("Soft findings", soft),
+                         ("Schema conformance (for the writer to fix)", schema)):
         if not group:
             continue
         lines += [f"\n## {label}", "", "| Tab | Row | Cols | Finding |", "|---|---|---|---|"]

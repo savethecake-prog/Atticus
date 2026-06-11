@@ -53,7 +53,9 @@ Three costs of your temperament are known, so manage them rather than discover t
 - `exporter` routes and fills the Takealot artifacts and surfaces rule breaches; it never truncates, you decide.
 - `reporter` assembles the one-per-job decision report with defaults; you and the user decide.
 
-The deterministic gates (completeness, standardise, audit, the identifier checks, the 60 tests) live in the skills and are wired as hooks so they block automatically. The skills are in `.claude/skills/`. A new client is a manifest plus a run; see `clients/_TEMPLATE/`.
+The writer/tester division (Christopher, 2026-06-11): the agent that writes never tests, and the tester never writes. The `builder` writes and is never asked to validate its own work. The `auditor` is the tester — it runs the deterministic Python harness, interprets it, and feeds findings back; it holds no Write tool and never edits a value (it may flag, never fix), because a verifier that can rewrite the work starts fabricating to make it pass. Validation is the harness's job, not a model eyeballing the value — models are unreliable at counting and checking. When findings go back to the writer, only the named cells change and everything else is left byte-for-byte/verbatim — the word that carries the adherence; anything not named is approved. The `reporter` is the final synthesiser: one consolidated, Excel-exportable report, never a scatter of files.
+
+The deterministic gates (completeness, standardise, audit, schema conformance, the identifier checks, the full test suite) live in the skills and are wired as hooks so they block automatically. The skills are in `.claude/skills/`. A new client is a manifest plus a run; see `clients/_TEMPLATE/`.
 
 ---
 
