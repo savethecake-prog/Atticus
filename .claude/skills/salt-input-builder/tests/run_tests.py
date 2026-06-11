@@ -689,6 +689,10 @@ def test_standardise_style():
     check("style: capacity compacted", f("Memory capacity:", "16 GB") == "16GB")
     check("style: natural language not compacted",
           f("Front camera:", "8 megapixel") == "8 megapixel")
+    # density g/cm³ must NOT be weight-rounded (Thermal Grizzly regression: 3.7 g/cm³ -> 4g/cm³)
+    check("style: density compacted, not weight-rounded", f("Density:", "3.7 g/cm³") == "3.7g/cm³")
+    check("style: density 2.6 not rounded to 3", f("Density:", "2.6 g/cm³") == "2.6g/cm³")
+    check("style: real weight still rounds (no slash)", f("Product weight:", "3.7 g") == "4g")
     # per-field units (Stage 4): only required dimension fields scale to mm;
     # cm-native fields keep cm and only compact.
     check("style: GPU length keeps cm, compacted", f("GPU Length:", "30.4 cm") == "30.4cm")
