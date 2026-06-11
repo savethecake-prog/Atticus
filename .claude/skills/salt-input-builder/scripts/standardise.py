@@ -66,6 +66,14 @@ _DIM = re.compile(
     r"(?:\s*[x×]\s*(\d+(?:[.,]\d+)?))?\s*(mm|cm|m)?\b", re.I)
 _LEN_ONE = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s+(mm|cm|m)\b", re.I)  # lone "520 mm" -> "520mm"
 _WT = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*([kK][gG]|g)\b")  # 'g' lowercase only: "4G"/"5G" network is not grams
+# compact the space between a number and an attached unit, for machine-readable
+# ingestion (Christopher's compact rule). A closed whitelist of units only, so
+# natural-language ("8 megapixel", "Up to 4") is never touched. cd/m² last so the
+# slash/superscript survive intact.
+_UNIT_COMPACT = re.compile(
+    r"(?<![A-Za-z0-9])(\d+(?:[.,]\d+)?)\s+("
+    r"GHz|MHz|kHz|KHz|Hz|Gbps|Mbps|GB/s|MB/s|TB|GB|MB|KB|mAh|nm|ms|DPI|dpi|cd/m²|W"
+    r")(?![A-Za-z])", re.I)
 _MONTHS = re.compile(r"\b(\d+)\s*[Mm]onths\b")                     # "12months"/"12 Months" -> "12 months"
 # temperatures carry a Celsius unit; angles carry a bare degree sign. Both spelled out.
 _TEMP_RANGE = re.compile(r"([+-]?\d+)\s*°?\s*C\s*(?:to|/|–|—|-)\s*([+-]?\d+)\s*°?\s*C", re.I)
@@ -99,21 +107,35 @@ def _scale(s, factor):
 
 def _norm_dim(m):
     a, b, c, unit = m.group(1), m.group(2), m.group(3), (m.group(4) or "").lower()
-    factor = {"cm": 10, "m": 1000, "mm": 1, "": 1}[unit]
     parts = [a, b] + ([c] if c else [])
-    if not unit:                       # cannot assert a unit -> leave untouched, flag elsewhere
-        return m.group(0)
-    nums = [_scale(p, factor) for p in parts]
-    # spaces around x, unit attached to the last number: "1300 x 690 x 640mm"
-    return " x ".join(nums[:-1] + [nums[-1] + "mm"])
+    if unit:
+        factor = {"cm": 10, "m": 1000, "mm": 1}[unit]
+        nums = [_scale(p, factor) for p in parts]
+        # compact, lowercase x, unit attached to the last number: "1300x690x640mm"
+        return "x".join(nums[:-1] + [nums[-1] + "mm"])
+    # no unit (e.g. a resolution "1920 x 1080"): compact the separators only,
+    # never scale and never assert mm. The unitless-dimension flag still fires.
+    return "x".join(str(_num(p)) for p in parts)
 
 
 def _norm_len_one(m):
     return f"{_num(m.group(1))}{m.group(2).lower()}"   # lone "520 mm" -> "520mm" (no scaling)
 
 
+def _round_half_up(x):
+    import math
+    return int(math.floor(x + 0.5))
+
+
 def _norm_wt(m):
-    return f"{_num(m.group(1))}{m.group(2).lower()}"   # "23.3 kg" -> "23.3kg"
+    """Compact, and apply the threshold rule: <1kg -> grams (no decimals,
+    <0.5 down / >=0.5 up), >=1kg -> kg; >=1000g -> kg."""
+    n, unit = _num(m.group(1)), m.group(2).lower()
+    grams = n * 1000 if unit == "kg" else n
+    if grams < 1000:
+        return f"{_round_half_up(grams)}g"
+    kg = grams / 1000
+    return f"{_num(str(int(kg) if kg == int(kg) else round(kg, 3)))}kg"
 
 
 def _ascii_safe(s):
@@ -175,6 +197,9 @@ def standardise_value(header, value):
     new = _LEN_ONE.sub(_norm_len_one, out)
     if new != out:
         notes.append("unit spacing"); out = new
+    new = _UNIT_COMPACT.sub(lambda m: f"{m.group(1)}{m.group(2)}", out)
+    if new != out:
+        notes.append("measurement compacted"); out = new
     new = _WT.sub(_norm_wt, out)
     if new != out:
         notes.append("weight format"); out = new
