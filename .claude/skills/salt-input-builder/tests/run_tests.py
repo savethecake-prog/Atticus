@@ -692,6 +692,45 @@ def test_standardise_style():
     check("style: socket-noise '(+)' flagged, not auto-stripped",
           any("socket" in fl.get("why", "") for fl in flags)
           and not any(fx["col"].strip() == "Socket compatibility:" for fx in fixes))
+    # media-skip narrowed: a spec field starting with "Video" is no longer skipped,
+    # but a genuine media-link column still is.
+    check("style: 'Video memory capacity' compacts (no longer skipped by 'video')",
+          f("Video memory capacity:", "16 GB") == "16GB")
+    check("style: 'Video base clock' compacts", f("Video base clock:", "2.40 GHz") == "2.40GHz")
+    check("style: media-link column still skipped",
+          f("Image URL:", "https://x/y 1.jpg") == "https://x/y 1.jpg"
+          and f("Video URL:", "https://a/b.mp4") == "https://a/b.mp4")
+
+
+def test_schema_spec():
+    import schema_spec as S
+    sch = S.load()
+    check("schema: table loaded (300+ fields)", len(sch.fields) >= 300)
+    # field-keyed lookup resolves the old 'video' substring collision
+    f = sch.lookup("Video memory capacity:")
+    check("schema: header maps to its field by name key", f is not None
+          and f["field_id"] == "product_attribute_gpu_memory-capacity")
+    # char-length rule
+    v = sch.validate_value("CPU Family:", "Ryzen 9 Extra")  # >7 chars
+    check("schema: max_len violation caught", any(x["rule"] == "max_len" for x in v))
+    check("schema: within max_len passes", sch.validate_value("CPU Family:", "Ryzen 5") == [])
+    # single-select enum
+    bad = sch.validate_value("Ray Tracing Support:", "Maybe")
+    check("schema: single-select out-of-set caught", any(x["rule"] == "single_select" for x in bad))
+    check("schema: single-select valid passes", sch.validate_value("Ray Tracing Support:", "Yes") == [])
+    # required glyph and banned token
+    g = sch.validate_value("Input Charging Port 1:", "5.0V/3.0A")  # missing ⎓
+    check("schema: required glyph missing caught", any(x["rule"] == "required_glyph" for x in g))
+    b = sch.validate_value("CPU Supported Memory Frequency:", "5600MT/s")
+    check("schema: banned token caught", any(x["rule"] == "banned" for x in b))
+    # compact + apostrophe
+    cpt = sch.validate_value("Product dimensions:", "161 x 75 x 8 mm")
+    check("schema: compact field with spaces caught", any(x["rule"] == "compact" for x in cpt))
+    ap = sch.validate_value("What's in the box:", "1 x Phone’s charger")
+    check("schema: curly apostrophe caught", any(x["rule"] == "apostrophe" for x in ap))
+    # an unmapped header carries no rules (we never invent constraints)
+    check("schema: unmapped header yields no findings",
+          sch.validate_value("Some bespoke field:", "whatever value here") == [])
 
 
 def main():
@@ -702,7 +741,8 @@ def main():
                test_from_spec_table, test_completeness, test_match, test_answer_kind,
                test_fields_semantic, test_standardise_style, test_format_xlsx, test_derive,
                test_completeness_lone, test_ean_integrity, test_delivery, test_consolidate,
-               test_column_coverage, test_receipt_closure, test_closure_reflex]:
+               test_column_coverage, test_receipt_closure, test_closure_reflex,
+               test_schema_spec]:
         try:
             fn()
         except Exception as ex:  # noqa

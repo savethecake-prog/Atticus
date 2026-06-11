@@ -45,18 +45,25 @@ A → B (staged) → C. All 139 tests stay green at every step. Work on a fresh 
 - Deferred to Stage 2: full per-field rule table, comma policy, cm-native units,
   char-length and enum/glyph validation (⎓, ², U+0027 apostrophe, MT/s ban).
 
-## Stage 2 backlog (schema-driven validator)
-- Key rules on field_id, not loose header substrings. Current `SKIP_VALUE`
-  substring "video" wrongly skips GPU fields ("Video memory capacity", "Video base
-  clock") so they are never compacted — a field_id table removes this collision.
-- Comma policy per field (contrast ratio: none; storage speeds: thousands separators).
-- cm-native fields (GPU length/height/width, monitor physical dims) must NOT be
-  scaled to mm — keep their unit, only compact. Stage 1 still scales multi-axis cm
-  to mm; schema units will override this per field.
-- Char-length, enum (single-select), and required-glyph validation: ⎓ in charging
-  ports, ² in mm², U+0027 apostrophe (not U+2019) and sentence case in What's-in-box,
-  MT/s banned (use MHz). Source workbook vendored at
-  references/schema/ecommerce_schema_2026-06-11.xlsx.
+## Stage 2 — DONE (branch: claude/schema-driven-validator-stage2)
+Schema-driven, field-keyed validator built from the vendored workbook.
+- `build_schema_rules.py` (dev-time, openpyxl) parses both tabs → 318 fields into
+  `references/schema/schema_rules.json` (committed, reviewable, dependency-free).
+  Parsed: max/min/eq char-length, single-select + allowed set, compaction,
+  required glyph, banned token, apostrophe (U+0027), sentence case.
+- `schema_spec.py` (runtime, no openpyxl for value checks) maps each house header
+  to its field by NAME KEY — not a substring — and validates. Reports, never rewrites.
+  This is the tester harness Stage 3's tester agent will call.
+- Fixed the `SKIP_VALUE` "video"/"image" substring collision: media columns are now
+  matched precisely by `_is_media()`, so "Video memory capacity" / "Video base clock"
+  compact correctly while real media-link columns stay skipped.
+- Registered in CLAUDE.md §9 (auditor checklist) and SKILL.md. Suite 149 → 163.
+
+### Deferred onward to Stage 3 / later
+- Comma policy per field (contrast ratio: none; storage speeds: thousands separators)
+  and cm-native fields that must NOT scale to mm — the JSON carries `examples` and
+  `data_type` to drive these; the standardiser does not yet consult the table for
+  per-field units. Wire when the tester/standardiser loop is built in Stage 3.
 
 ## Flagged to Christopher (not silently absorbed)
 - Schema DB row 17 labels dimensions "in centimetres (mm)" — contradictory; unit is mm.

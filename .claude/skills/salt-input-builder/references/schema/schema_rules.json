@@ -1,0 +1,4878 @@
+{
+ "source": "ecommerce_schema_2026-06-11.xlsx",
+ "fields": [
+  {
+   "field_id": "product_title",
+   "field_name": "Title",
+   "name_key": "title",
+   "data_type": "Text string with HTML",
+   "examples": [
+    "<h1>Vans Old Skool 36+ Skate Shoes</h1>"
+   ],
+   "rules": {
+    "raw": "≤75 characters",
+    "max_len": 75
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_sku",
+   "field_name": "SKU",
+   "name_key": "sku",
+   "data_type": "Text string",
+   "examples": [
+    "YD3400C5FHBOX",
+    "100-100001581WOF",
+    "MAG273QPQD-OLEDX24",
+    "PRIME-X870-PWIFI"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_brand",
+   "field_name": "Brand",
+   "name_key": "brand",
+   "data_type": "Text string",
+   "examples": [
+    "AMD",
+    "MSI",
+    "ASUS",
+    "WINX",
+    "Xiaomi",
+    "Gizzu",
+    "PCBuilder"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_category",
+   "field_name": "Category",
+   "name_key": "category",
+   "data_type": "Text string",
+   "examples": [
+    "Smart TVs",
+    "Monitors",
+    "Keyboards",
+    "Liquor"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_region_sale",
+   "field_name": "Sale region",
+   "name_key": "saleregion",
+   "data_type": "Text string",
+   "examples": [
+    "South Africa",
+    "Namibia",
+    "Zimbabwe",
+    "Thailand"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_region_manufactured",
+   "field_name": "Manufactured region",
+   "name_key": "manufacturedregion",
+   "data_type": "Text string",
+   "examples": [
+    "China"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_warranty-period",
+   "field_name": "Warranty period",
+   "name_key": "warrantyperiod",
+   "data_type": "Text string",
+   "examples": [
+    "6 months",
+    "12 months",
+    "24 months"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_whats_in_the_box",
+   "field_name": "What's in the box",
+   "name_key": "whatsinthebox",
+   "data_type": "Text string with HTML",
+   "examples": [
+    "<h2>What's in the box</h3>\n<ul>\n<li>1 x Pair of Vans Skate Old Skool 36+ Shoes</li>\n<li>2 x Pairs of Shoe Laces (Pink)</li>\n</ul>"
+   ],
+   "rules": {
+    "raw": "Use U+0027 ( ' ), NOT U+2019 ( ’ ). | Use sentence case for capitalisation, not title case or all caps.",
+    "apostrophe": "straight",
+    "case": "sentence"
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "document_id",
+   "field_name": "DocumentID",
+   "name_key": "documentid",
+   "data_type": "String",
+   "examples": [
+    "STA418FEE90220251218",
+    "UCT105QUO66120251218",
+    "UNI739FEE28420251218"
+   ],
+   "rules": {
+    "raw": "RANDOM_NUMERIC(3) ∈ [000–999], FORMAT(document_date) = YYYYMMDD, document_id IS UNIQUE, & generated on ingest"
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "document_file_name",
+   "field_name": "Document file name",
+   "name_key": "documentfilename",
+   "data_type": "Text",
+   "examples": [
+    "Stadio_FeeStatement_3718_20251218"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "document_type",
+   "field_name": "Document type",
+   "name_key": "documenttype",
+   "data_type": "Enum",
+   "examples": [
+    "INVOICE",
+    "FEE_STATEMENT",
+    "QUOTE",
+    "AMBIGUOUS",
+    "ERROR"
+   ],
+   "rules": {
+    "raw": "Single-select from FIELD_EXAMPLES values ONLY",
+    "single_select": true,
+    "allowed": [
+     "INVOICE",
+     "FEE_STATEMENT",
+     "QUOTE",
+     "AMBIGUOUS",
+     "ERROR"
+    ]
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "document_date",
+   "field_name": "Document date",
+   "name_key": "documentdate",
+   "data_type": "Date",
+   "examples": [
+    "YYYY-MM-DD"
+   ],
+   "rules": {
+    "raw": "ISO 8601 date only (no time)"
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_device-colour",
+   "field_name": "Product colour",
+   "name_key": "productcolour",
+   "data_type": "Text string",
+   "examples": [
+    "Black",
+    "Silver"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_operating-temperature",
+   "field_name": "Operating temperature",
+   "name_key": "operatingtemperature",
+   "data_type": "Text string",
+   "examples": [
+    "95 degress Celcius",
+    "10-40 degrees Celcius"
+   ],
+   "rules": {},
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_device-weight",
+   "field_name": "Product weight",
+   "name_key": "productweight",
+   "data_type": "Text string",
+   "examples": [
+    "1kg",
+    "150g",
+    "183g"
+   ],
+   "rules": {
+    "raw": "≤999grams then use grams"
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_device-dimensions",
+   "field_name": "Product dimensions",
+   "name_key": "productdimensions",
+   "data_type": "Text string",
+   "examples": [
+    "30x10x6mm",
+    "14x17x15mm"
+   ],
+   "rules": {
+    "raw": "Flatten so no spacing",
+    "compact": true
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_packaging_weight",
+   "field_name": "Packaging weight",
+   "name_key": "packagingweight",
+   "data_type": "Text string",
+   "examples": [
+    "1.2kg",
+    "750g",
+    "205g"
+   ],
+   "rules": {
+    "raw": "≤999grams then use grams"
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_attribute_packaging_dimensions",
+   "field_name": "Packaging dimensions",
+   "name_key": "packagingdimensions",
+   "data_type": "Text string",
+   "examples": [
+    "34x12x7.5mm",
+    "15x20x18mm"
+   ],
+   "rules": {
+    "raw": "Accuracy is required as used in delivery cost calculations by e-commerce platforms."
+   },
+   "source_tab": "PRODUCT_CATEGORY-DB"
+  },
+  {
+   "field_id": "product_creation_date",
+   "field_name": "Product creation date",
+   "name_key": "productcreationdate",
+   "data_type": "Text string",
+   "examples": [
+    "2025-01-20",
+    "2025-07-01",
+    "2025-10-01"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-family",
+   "field_name": "CPU Family",
+   "name_key": "cpufamily",
+   "data_type": "Text string",
+   "examples": [
+    "Ryzen 3",
+    "Ryzen 5",
+    "Ryzen 7",
+    "Core i5",
+    "Core i7"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-series",
+   "field_name": "CPU Series",
+   "name_key": "cpuseries",
+   "data_type": "Text string",
+   "examples": [
+    "Ryzen 3000 series",
+    "Ryzen 5000 series",
+    "Ryzen 7000 series",
+    "Ryzen 9000 series",
+    "Intel 12th Gen",
+    "Intel 14th Gen"
+   ],
+   "rules": {
+    "raw": "≥10 characters",
+    "min_len": 10
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-socket",
+   "field_name": "CPU Socket",
+   "name_key": "cpusocket",
+   "data_type": "Text string",
+   "examples": [
+    "AM4",
+    "AM5",
+    "LGA1700",
+    "FCLGA1851"
+   ],
+   "rules": {
+    "raw": "≤9 characters",
+    "max_len": 9
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-processor",
+   "field_name": "CPU Processor",
+   "name_key": "cpuprocessor",
+   "data_type": "Text string",
+   "examples": [
+    "8400F",
+    "8700G",
+    "9600X",
+    "9800X3D",
+    "12400F"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-architecture",
+   "field_name": "CPU Architecture",
+   "name_key": "cpuarchitecture",
+   "data_type": "Text string",
+   "examples": [
+    "Zen 4"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-cores",
+   "field_name": "CPU Cores",
+   "name_key": "cpucores",
+   "data_type": "Numeral",
+   "examples": [
+    "4",
+    "6",
+    "8",
+    "12",
+    "16"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-lithography",
+   "field_name": "CPU Lithography",
+   "name_key": "cpulithography",
+   "data_type": "Text string",
+   "examples": [
+    "4nm",
+    "5nm",
+    "7nm",
+    "12nm"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-threads",
+   "field_name": "CPU Threads",
+   "name_key": "cputhreads",
+   "data_type": "Numeral",
+   "examples": [
+    "8",
+    "12",
+    "16",
+    "20"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-base-frequency",
+   "field_name": "CPU Base Frequency",
+   "name_key": "cpubasefrequency",
+   "data_type": "Text string",
+   "examples": [
+    "3.40GHz",
+    "3.70GHz",
+    "3.80GHz",
+    "4.30GHz",
+    "4.70GHz"
+   ],
+   "rules": {
+    "raw": "=7 characters",
+    "eq_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-boost-frequency",
+   "field_name": "CPU Boost Frequency",
+   "name_key": "cpuboostfrequency",
+   "data_type": "Text string",
+   "examples": [
+    "Up to 3.70GHz",
+    "Up to 4.20GHz",
+    "Up to 4.60GHz",
+    "Up to 5.00GHz",
+    "Up to 5.70GHz"
+   ],
+   "rules": {
+    "raw": "≥13 characters",
+    "min_len": 13
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-cache-l1",
+   "field_name": "CPU Cache L1",
+   "name_key": "cpucachel1",
+   "data_type": "Text string",
+   "examples": [
+    "64KB",
+    "1MB",
+    "2MB",
+    "4MB",
+    "6MB",
+    "8MB",
+    "12MB",
+    "16MB",
+    "20MB",
+    "25MB",
+    "32MB",
+    "33MB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-cache-l2",
+   "field_name": "CPU Cache L2",
+   "name_key": "cpucachel2",
+   "data_type": "Text string",
+   "examples": [
+    "64KB",
+    "1MB",
+    "2MB",
+    "4MB",
+    "6MB",
+    "8MB",
+    "12MB",
+    "16MB",
+    "20MB",
+    "25MB",
+    "32MB",
+    "33MB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-cache-l3",
+   "field_name": "CPU Cache L3",
+   "name_key": "cpucachel3",
+   "data_type": "Text string",
+   "examples": [
+    "64KB",
+    "1MB",
+    "2MB",
+    "4MB",
+    "6MB",
+    "8MB",
+    "12MB",
+    "16MB",
+    "20MB",
+    "25MB",
+    "32MB",
+    "33MB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-smart-cache",
+   "field_name": "CPU Smart Cache",
+   "name_key": "cpusmartcache",
+   "data_type": "Text string",
+   "examples": [
+    "64KB",
+    "1MB",
+    "2MB",
+    "4MB",
+    "6MB",
+    "8MB",
+    "12MB",
+    "16MB",
+    "20MB",
+    "25MB",
+    "32MB",
+    "33MB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-tdp",
+   "field_name": "CPU TDP",
+   "name_key": "cputdp",
+   "data_type": "Text string",
+   "examples": [
+    "30W",
+    "45W",
+    "60W",
+    "65W",
+    "80W",
+    "120W"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-overclock-status",
+   "field_name": "CPU Overclock Status",
+   "name_key": "cpuoverclockstatus",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-included-cooler",
+   "field_name": "CPU Included Cooler",
+   "name_key": "cpuincludedcooler",
+   "data_type": "Text string",
+   "examples": [
+    "Wraith Cooler"
+   ],
+   "rules": {
+    "raw": "≥10 characters",
+    "min_len": 10
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-onboard-graphics",
+   "field_name": "CPU Onboard Graphics",
+   "name_key": "cpuonboardgraphics",
+   "data_type": "Text string",
+   "examples": [
+    "AMD Radeon 760M",
+    "AMD Radeon 780M",
+    "Intel UHD Graphics 770",
+    "Intel Iris Xe Graphics G7 96EU Mobile"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-pci-express-version",
+   "field_name": "CPU PCI Express Version",
+   "name_key": "cpupciexpressversion",
+   "data_type": "Text string",
+   "examples": [
+    "PCIe 3.0",
+    "PCIe 4.0",
+    "PCIe 5.0"
+   ],
+   "rules": {
+    "raw": "=8 characters",
+    "eq_len": 8
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-supported-memory-generation",
+   "field_name": "CPU Supported Memory Generation",
+   "name_key": "cpusupportedmemorygeneration",
+   "data_type": "Text string",
+   "examples": [
+    "DDR3",
+    "DDR4",
+    "DDR5",
+    "DDR4 | DDR5"
+   ],
+   "rules": {
+    "raw": "≥4 characters",
+    "min_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-supported-memory-frequency",
+   "field_name": "CPU Supported Memory Frequency",
+   "name_key": "cpusupportedmemoryfrequency",
+   "data_type": "Text string",
+   "examples": [
+    "3200MHz",
+    "3600MHz",
+    "4800MHz",
+    "5200MHz",
+    "3600MHz | 5600MHz"
+   ],
+   "rules": {
+    "raw": "DO NOT use MT/s as it is a different measurement",
+    "banned": [
+     "MT/s"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-max-supported-memory-capacity",
+   "field_name": "CPU Max Supported Memory Capacity",
+   "name_key": "cpumaxsupportedmemorycapacity",
+   "data_type": "Text string",
+   "examples": [
+    "16GB",
+    "32GB",
+    "64GB",
+    "128GB",
+    "192GB",
+    "256GB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cpu-supported-motherboard-chipsets",
+   "field_name": "CPU Supported Motherboard Chipsets",
+   "name_key": "cpusupportedmotherboardchipsets",
+   "data_type": "Text string",
+   "examples": [
+    "A620 | B650 | X670 | B840 | B850 | X870",
+    "A620",
+    "B840",
+    "X850"
+   ],
+   "rules": {
+    "raw": "DO NOT reuse the CPU Chipset Series here"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-battery-capacity",
+   "field_name": "Battery Capacity",
+   "name_key": "batterycapacity",
+   "data_type": "Text string",
+   "examples": [
+    "10,000mAh",
+    "15,000mAh",
+    "20,000mAh",
+    "30,000mAh"
+   ],
+   "rules": {
+    "raw": "≥8 characters",
+    "min_len": 8
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-battery-conversion-rate",
+   "field_name": "Battery Conversion Rate",
+   "name_key": "batteryconversionrate",
+   "data_type": "Text string",
+   "examples": [
+    "74% 5V/3A"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-battery-rated-capacity",
+   "field_name": "Battery Rated Capacity",
+   "name_key": "batteryratedcapacity",
+   "data_type": "Text string",
+   "examples": [
+    "7,400mAh",
+    "11,100mAh",
+    "14,800mAh",
+    "22,200mAh"
+   ],
+   "rules": {
+    "raw": "≥8 characters",
+    "min_len": 8
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-battery-wattage",
+   "field_name": "Battery Wattage",
+   "name_key": "batterywattage",
+   "data_type": "Text string",
+   "examples": [
+    "22.5W,",
+    "140W",
+    "18W"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-battery-charging-technology",
+   "field_name": "Battery Charging Technology",
+   "name_key": "batterychargingtechnology",
+   "data_type": "Text string",
+   "examples": [
+    "Power Delivery (PD)",
+    "Quick Charge (QC)",
+    "Wireless Charging (Wireless)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-battery-recharge-time",
+   "field_name": "Battery Recharge Time",
+   "name_key": "batteryrechargetime",
+   "data_type": "Text string",
+   "examples": [
+    "Approximately 6 hours via 5V/2A"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_total",
+   "field_name": "Total Charging Ports",
+   "name_key": "totalchargingports",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_input-type_1",
+   "field_name": "Input Charging Port 1",
+   "name_key": "inputchargingport1",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_input-type_2",
+   "field_name": "Input Charging Port 2",
+   "name_key": "inputchargingport2",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_input-type_3",
+   "field_name": "Input Charging Port 3",
+   "name_key": "inputchargingport3",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_input-type_4",
+   "field_name": "Input Charging Port 4",
+   "name_key": "inputchargingport4",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_input-type_5",
+   "field_name": "Input Charging Port 5",
+   "name_key": "inputchargingport5",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_output-type_1",
+   "field_name": "Output Charging Port 1",
+   "name_key": "outputchargingport1",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_output-type_2",
+   "field_name": "Output Charging Port 2",
+   "name_key": "outputchargingport2",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_output-type_3",
+   "field_name": "Output Charging Port 3",
+   "name_key": "outputchargingport3",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_output-type_4",
+   "field_name": "Output Charging Port 4",
+   "name_key": "outputchargingport4",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-charging-ports_output-type_5",
+   "field_name": "Output Charging Port 5",
+   "name_key": "outputchargingport5",
+   "data_type": "Text string",
+   "examples": [
+    "5.0V⎓3.0A"
+   ],
+   "rules": {
+    "raw": "⎓ is required",
+    "required_glyph": "⎓"
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-special-feature_indicator-lights",
+   "field_name": "Indicator Lights",
+   "name_key": "indicatorlights",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-special-feature_digital-display",
+   "field_name": "Digital Display",
+   "name_key": "digitaldisplay",
+   "data_type": "Text string",
+   "examples": [
+    "Digital display",
+    "LCD display"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-special-feature_built-in-cables",
+   "field_name": "Built-in Cables",
+   "name_key": "builtincables",
+   "data_type": "Text string",
+   "examples": [
+    "1m USB to Type-C cable"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_power-special-feature_protection-features",
+   "field_name": "Battery Protection Features",
+   "name_key": "batteryprotectionfeatures",
+   "data_type": "Text string",
+   "examples": [
+    "Short circuit, overcharge, & over-discharge"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-generation",
+   "field_name": "Graphic Generation",
+   "name_key": "graphicgeneration",
+   "data_type": "Text string",
+   "examples": [
+    "GeForce 50 series",
+    "Radeon 700M series",
+    "Intel Iris Xe series"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-engine",
+   "field_name": "Graphic Engine",
+   "name_key": "graphicengine",
+   "data_type": "Text string",
+   "examples": [
+    "GeForce RTX 5080",
+    "Radeon RX 9070 XT"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-model",
+   "field_name": "Graphic Model",
+   "name_key": "graphicmodel",
+   "data_type": "Text string",
+   "examples": [
+    "Radeon RX 9070 XT Prime"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-chipset",
+   "field_name": "Graphic Chipset",
+   "name_key": "graphicchipset",
+   "data_type": "Text string",
+   "examples": [
+    "GB203"
+   ],
+   "rules": {
+    "raw": "≥5 characters",
+    "min_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-architecture",
+   "field_name": "Graphic Architecture",
+   "name_key": "graphicarchitecture",
+   "data_type": "Text string",
+   "examples": [
+    "Blackwell 2.0"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-lithography",
+   "field_name": "Graphic Chipset Lithography",
+   "name_key": "graphicchipsetlithography",
+   "data_type": "Text string",
+   "examples": [
+    "4nm",
+    "5nm",
+    "7nm",
+    "12nm"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-transistors",
+   "field_name": "Graphic Chipset Transistors",
+   "name_key": "graphicchipsettransistors",
+   "data_type": "Text string",
+   "examples": [
+    "45600M"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-density",
+   "field_name": "Graphic Chipset Density",
+   "name_key": "graphicchipsetdensity",
+   "data_type": "Text string",
+   "examples": [
+    "120.6M/mm²"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-die-size",
+   "field_name": "Graphic Chipset Die Size",
+   "name_key": "graphicchipsetdiesize",
+   "data_type": "Text string",
+   "examples": [
+    "378 mm²"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-type",
+   "field_name": "Graphic Chipset Type",
+   "name_key": "graphicchipsettype",
+   "data_type": "Text string",
+   "examples": [
+    "4N FinFET"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_processor-graphic-interface",
+   "field_name": "Graphic Interface",
+   "name_key": "graphicinterface",
+   "data_type": "Text string",
+   "examples": [
+    "PCIe 3.0",
+    "PCIe 4.0",
+    "PCIe 5.0"
+   ],
+   "rules": {
+    "raw": "≥8 characters",
+    "min_len": 8
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-shading-cores",
+   "field_name": "GPU Shading Cores",
+   "name_key": "gpushadingcores",
+   "data_type": "Numeral",
+   "examples": [
+    "512",
+    "768",
+    "10752"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-tensor-cores-generation",
+   "field_name": "GPU Tensor Cores Generation",
+   "name_key": "gputensorcoresgeneration",
+   "data_type": "Text string",
+   "examples": [
+    "5th Generation"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-tensor-cores",
+   "field_name": "GPU Tensor Cores",
+   "name_key": "gputensorcores",
+   "data_type": "Numeral",
+   "examples": [
+    "336"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-ray-tracing-cores-generation",
+   "field_name": "GPU Ray Tracing Cores Generation",
+   "name_key": "gpuraytracingcoresgeneration",
+   "data_type": "Text string",
+   "examples": [
+    "4th Generation"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-ray-tracing-cores",
+   "field_name": "GPU Ray Tracing Cores",
+   "name_key": "gpuraytracingcores",
+   "data_type": "Numeral",
+   "examples": [
+    "84"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-tmus",
+   "field_name": "GPU TMUs",
+   "name_key": "gputmus",
+   "data_type": "Numeral",
+   "examples": [
+    "336"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-rops",
+   "field_name": "GPU Render Output Units",
+   "name_key": "gpurenderoutputunits",
+   "data_type": "Numeral",
+   "examples": [
+    "112"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-sm-count",
+   "field_name": "GPU Streaming Multiprocessors Count",
+   "name_key": "gpustreamingmultiprocessorscount",
+   "data_type": "Numeral",
+   "examples": [
+    "84"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-cache-l1",
+   "field_name": "GPU L1 Cache",
+   "name_key": "gpul1cache",
+   "data_type": "Text string",
+   "examples": [
+    "512KB",
+    "4MB",
+    "8MB",
+    "16MB",
+    "32MB",
+    "64MB",
+    "96MB",
+    "128MB"
+   ],
+   "rules": {
+    "raw": "≤5 characters (& no spacing allowed)",
+    "max_len": 5,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_render-cache-l2",
+   "field_name": "GPU L2 Cache",
+   "name_key": "gpul2cache",
+   "data_type": "Text string",
+   "examples": [
+    "512KB",
+    "4MB",
+    "8MB",
+    "16MB",
+    "32MB",
+    "64MB",
+    "96MB",
+    "128MB"
+   ],
+   "rules": {
+    "raw": "≤5 characters (& no spacing allowed)",
+    "max_len": 5,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_speed-base-clock",
+   "field_name": "Video Base Clock",
+   "name_key": "videobaseclock",
+   "data_type": "Text string",
+   "examples": [
+    "2.295GHz",
+    "2.350GHz",
+    "2.405GHz"
+   ],
+   "rules": {
+    "raw": "≤8 characters (& no spacing allowed)",
+    "max_len": 8,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_speed-boost-clock",
+   "field_name": "Video Boost Clock",
+   "name_key": "videoboostclock",
+   "data_type": "Text string",
+   "examples": [
+    "2.617GHz",
+    "2.640GHz",
+    "2.695GHz"
+   ],
+   "rules": {
+    "raw": "≤8 characters (& no spacing allowed)",
+    "max_len": 8,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_speed-overclock",
+   "field_name": "Video Overclock",
+   "name_key": "videooverclock",
+   "data_type": "Text string",
+   "examples": [
+    "2.630GHz",
+    "2.655GHz",
+    "2.710GHz"
+   ],
+   "rules": {
+    "raw": "≤8 characters (& no spacing allowed)",
+    "max_len": 8,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_speed-memory-speed",
+   "field_name": "Video Memory Speed",
+   "name_key": "videomemoryspeed",
+   "data_type": "Text string",
+   "examples": [
+    "20Gbps"
+   ],
+   "rules": {
+    "raw": "≤5 characters (& no spacing allowed)",
+    "max_len": 5,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_memory-capacity",
+   "field_name": "Video Memory Capacity",
+   "name_key": "videomemorycapacity",
+   "data_type": "Text string",
+   "examples": [
+    "4GB",
+    "8GB",
+    "12GB",
+    "16GB"
+   ],
+   "rules": {
+    "raw": "≤4 characters (& no spacing allowed)",
+    "max_len": 4,
+    "compact": true
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_memory-generation",
+   "field_name": "Video Memory Generation",
+   "name_key": "videomemorygeneration",
+   "data_type": "Text string",
+   "examples": [
+    "GDDR7"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_memory-bus",
+   "field_name": "Video Memory Bus",
+   "name_key": "videomemorybus",
+   "data_type": "Text string",
+   "examples": [
+    "256-bit"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_memory-bandwidth",
+   "field_name": "Video Memory Bandwidth",
+   "name_key": "videomemorybandwidth",
+   "data_type": "Text string",
+   "examples": [
+    "960GB/s"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-ray-tracing",
+   "field_name": "Ray Tracing Support",
+   "name_key": "raytracingsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-ai",
+   "field_name": "AI Support",
+   "name_key": "aisupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-dlss",
+   "field_name": "DLSS Support",
+   "name_key": "dlsssupport",
+   "data_type": "Text string",
+   "examples": [
+    "DLSS 4 | Super resolution | DLAA | Ray reconstruction | Frame generation | Multi frame generation"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-reflex",
+   "field_name": "NVIDIA Reflex Support",
+   "name_key": "nvidiareflexsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Reflex 2 | Low latency mode | Frame warp"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-broadcast",
+   "field_name": "NVIDIA Broadcast Support",
+   "name_key": "nvidiabroadcastsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-resizable-bar",
+   "field_name": "Resizable Bar Support",
+   "name_key": "resizablebarsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-app",
+   "field_name": "NVIDIA App Support",
+   "name_key": "nvidiaappsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-photo-mode",
+   "field_name": "Photo Mode Support",
+   "name_key": "photomodesupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-freestyle",
+   "field_name": "NVIDIA FreeStyle Support",
+   "name_key": "nvidiafreestylesupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-shadowplay",
+   "field_name": "NVIDIA ShadowPlay Support",
+   "name_key": "nvidiashadowplaysupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-highlights",
+   "field_name": "NVIDIA Highlights Support",
+   "name_key": "nvidiahighlightssupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-g-sync",
+   "field_name": "NVIDIA G-Sync Support",
+   "name_key": "nvidiagsyncsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-game-ready-driver",
+   "field_name": "Game Ready Driver Support",
+   "name_key": "gamereadydriversupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-studio-driver",
+   "field_name": "NVIDIA Studio Driver Support",
+   "name_key": "nvidiastudiodriversupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-omniverse",
+   "field_name": "NVIDIA Omniverse Support",
+   "name_key": "nvidiaomniversesupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-rtx-remix",
+   "field_name": "RTX Remix Support",
+   "name_key": "rtxremixsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-directx-12",
+   "field_name": "DirectX 12 Support",
+   "name_key": "directx12support",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-gpu-boost",
+   "field_name": "NVIDIA GPU Boost Support",
+   "name_key": "nvidiagpuboostsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-nvlink",
+   "field_name": "NVIDIA NVLink Support",
+   "name_key": "nvidianvlinksupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-vulkan-version",
+   "field_name": "Vulkan",
+   "name_key": "vulkan",
+   "data_type": "Numeral",
+   "examples": [
+    "1.4"
+   ],
+   "rules": {
+    "raw": "≥3 characters",
+    "min_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-opengl-version",
+   "field_name": "OpenGL",
+   "name_key": "opengl",
+   "data_type": "Numeral",
+   "examples": [
+    "4.6"
+   ],
+   "rules": {
+    "raw": "≥3 characters",
+    "min_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-opencl-version",
+   "field_name": "OpenCL",
+   "name_key": "opencl",
+   "data_type": "Numeral",
+   "examples": [
+    "3.0"
+   ],
+   "rules": {
+    "raw": "≥3 characters",
+    "min_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-cuda-version",
+   "field_name": "CUDA",
+   "name_key": "cuda",
+   "data_type": "Numeral",
+   "examples": [
+    "12.0"
+   ],
+   "rules": {
+    "raw": "≥3 characters",
+    "min_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-shader-model",
+   "field_name": "Shader model",
+   "name_key": "shadermodel",
+   "data_type": "Numeral",
+   "examples": [
+    "6.8"
+   ],
+   "rules": {
+    "raw": "≥3 characters",
+    "min_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-encoder-nvenc",
+   "field_name": "NVIDIA Encoder (NVENC) Support",
+   "name_key": "nvidiaencodernvencsupport",
+   "data_type": "Text string",
+   "examples": [
+    "9th Generation"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-nvidia-decoder-nvdec",
+   "field_name": "NVIDIA Decoder (NVDEC) Support",
+   "name_key": "nvidiadecodernvdecsupport",
+   "data_type": "Text string",
+   "examples": [
+    "6th Generation"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-av1-encode",
+   "field_name": "AV1 Encode Support",
+   "name_key": "av1encodesupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-av1-decode",
+   "field_name": "AV1 Decode Support",
+   "name_key": "av1decodesupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-vr-ready",
+   "field_name": "VR Ready Support",
+   "name_key": "vrreadysupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-purevideo-hd",
+   "field_name": "PureVideo HD",
+   "name_key": "purevideohd",
+   "data_type": "Text string",
+   "examples": [
+    "VP11"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tech-vdpau",
+   "field_name": "VDPAU",
+   "name_key": "vdpau",
+   "data_type": "Text string",
+   "examples": [
+    "Feature Set K"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_max-digital-resolution",
+   "field_name": "Max Digital Resolution",
+   "name_key": "maxdigitalresolution",
+   "data_type": "Text string",
+   "examples": [
+    "4K at 480Hz | 8K at 165Hz (with DSC)",
+    "7680×4320"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_output-connectors",
+   "field_name": "Output Connectors",
+   "name_key": "outputconnectors",
+   "data_type": "Text string",
+   "examples": [
+    "3× DisplayPort 2.1b | 1x HDMI 2.1b"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_multi-monitor",
+   "field_name": "Multi-Monitor Support",
+   "name_key": "multimonitorsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Up to 4"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_hdcp-version",
+   "field_name": "HDCP Version",
+   "name_key": "hdcpversion",
+   "data_type": "Numeral",
+   "examples": [
+    "2.3"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_length",
+   "field_name": "GPU Length",
+   "name_key": "gpulength",
+   "data_type": "Text string",
+   "examples": [
+    "30.4 cm"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_height",
+   "field_name": "GPU Height",
+   "name_key": "gpuheight",
+   "data_type": "Text string",
+   "examples": [
+    "4.0 cm"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_width",
+   "field_name": "GPU Width",
+   "name_key": "gpuwidth",
+   "data_type": "Text string",
+   "examples": [
+    "13.7 cm"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_slot-support",
+   "field_name": "GPU Slot Support",
+   "name_key": "gpuslotsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Dual-slot"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_max-temperature",
+   "field_name": "GPU Max Temperature",
+   "name_key": "gpumaxtemperature",
+   "data_type": "Text string",
+   "examples": [
+    "88°C"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_tdp",
+   "field_name": "GPU TDP",
+   "name_key": "gputdp",
+   "data_type": "Text string",
+   "examples": [
+    "360W"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_suggested-psu",
+   "field_name": "Suggested Power Supply",
+   "name_key": "suggestedpowersupply",
+   "data_type": "Text string",
+   "examples": [
+    "850W"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_8-pin-power-connectors",
+   "field_name": "8-Pin Power Connectors",
+   "name_key": "8pinpowerconnectors",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_16-pin-power-connectors",
+   "field_name": "16-Pin Power Connectors",
+   "name_key": "16pinpowerconnectors",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_pixel-rate",
+   "field_name": "Pixel Rate",
+   "name_key": "pixelrate",
+   "data_type": "Text string",
+   "examples": [
+    "293.1 GPixel/s"
+   ],
+   "rules": {
+    "raw": "≥14 characters",
+    "min_len": 14
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_texture-rate",
+   "field_name": "Texture Rate",
+   "name_key": "texturerate",
+   "data_type": "Text string",
+   "examples": [
+    "879.3 GTexel/s"
+   ],
+   "rules": {
+    "raw": "≥14 characters",
+    "min_len": 14
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_fp16-half",
+   "field_name": "FP16 (Half)",
+   "name_key": "fp16half",
+   "data_type": "Text string",
+   "examples": [
+    "56.28 TFLOPS"
+   ],
+   "rules": {
+    "raw": "≥12 characters",
+    "min_len": 12
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_fp32-float",
+   "field_name": "FP32 (Float)",
+   "name_key": "fp32float",
+   "data_type": "Text string",
+   "examples": [
+    "56.28 TFLOPS"
+   ],
+   "rules": {
+    "raw": "≥12 characters",
+    "min_len": 12
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_gpu_fp64-double",
+   "field_name": "FP64 (Double)",
+   "name_key": "fp64double",
+   "data_type": "Text string",
+   "examples": [
+    "879.3 GFLOPS"
+   ],
+   "rules": {
+    "raw": "≥12 characters",
+    "min_len": 12
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard_form-factor",
+   "field_name": "Form Factor",
+   "name_key": "formfactor",
+   "data_type": "Text string",
+   "examples": [
+    "M-ATX",
+    "ATX",
+    "ATX3.0",
+    "ATX3.1",
+    "E-ATX",
+    "SFX",
+    "mATX",
+    "mITX"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard_bios",
+   "field_name": "BIOS",
+   "name_key": "bios",
+   "data_type": "Text string",
+   "examples": [
+    "Legacy BIOS",
+    "UEFI"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard_chipset",
+   "field_name": "Chipset",
+   "name_key": "chipset",
+   "data_type": "Text string",
+   "examples": [
+    "A520",
+    "B550",
+    "B840",
+    "B850",
+    "X670",
+    "X870"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard_tdp",
+   "field_name": "Motherboard TDP",
+   "name_key": "motherboardtdp",
+   "data_type": "Text string",
+   "examples": [
+    "50W",
+    "60W",
+    "70W",
+    "80W",
+    "90W",
+    "100W"
+   ],
+   "rules": {
+    "raw": "≤4 characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard_8pin-power-connectors",
+   "field_name": "8-Pin Power Connectors (4+4)",
+   "name_key": "8pinpowerconnectors44",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_CPU-models",
+   "field_name": "Supported CPU Models",
+   "name_key": "supportedcpumodels",
+   "data_type": "Text string",
+   "examples": [
+    "8400F",
+    "8700G",
+    "9600X",
+    "9800X3D",
+    "12400F"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_CPU-sockets",
+   "field_name": "Supported CPU Sockets",
+   "name_key": "supportedcpusockets",
+   "data_type": "Text string",
+   "examples": [
+    "AM4",
+    "AM5",
+    "LGA1700",
+    "LGA1851"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_dimm-slots",
+   "field_name": "Supported DIMM Slots",
+   "name_key": "supporteddimmslots",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_memory-generation",
+   "field_name": "Supported Memory Generation",
+   "name_key": "supportedmemorygeneration",
+   "data_type": "Text string",
+   "examples": [
+    "DDR3",
+    "DDR4",
+    "DDR5",
+    "DDR4 | DDR5"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_memory-clock",
+   "field_name": "Supported Memory Clock",
+   "name_key": "supportedmemoryclock",
+   "data_type": "Text string",
+   "examples": [
+    "3200MHz",
+    "3600MHz",
+    "4800MHz",
+    "5200MHz",
+    "3600MHz | 5600MHz"
+   ],
+   "rules": {
+    "raw": "DO NOT use MT/s as it is a different measurement",
+    "banned": [
+     "MT/s"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_max-memory-capacity",
+   "field_name": "Supported Max Memory Capacity",
+   "name_key": "supportedmaxmemorycapacity",
+   "data_type": "Text string",
+   "examples": [
+    "32GB",
+    "64GB",
+    "128GB",
+    "192GB",
+    "256GB",
+    "512GB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_pci-express",
+   "field_name": "Supported PCI Express",
+   "name_key": "supportedpciexpress",
+   "data_type": "Text string",
+   "examples": [
+    "PCIe 3.0",
+    "PCIe 4.0",
+    "PCIe 5.0"
+   ],
+   "rules": {
+    "raw": "≥8 characters",
+    "min_len": 8
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-supported_directx",
+   "field_name": "Supported DirectX",
+   "name_key": "supporteddirectx",
+   "data_type": "Numeral",
+   "examples": [
+    "10",
+    "11",
+    "12"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_sata-iii",
+   "field_name": "SATA 6Gb/s Slots",
+   "name_key": "sata6gbsslots",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_pci-express-4.0-x16",
+   "field_name": "PCIe 4.0 x16 Slots",
+   "name_key": "pcie40x16slots",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_pci-express-5.0-x16",
+   "field_name": "PCIe 5.0 x16 Slots",
+   "name_key": "pcie50x16slots",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_pci-express-x1",
+   "field_name": "PCIe x1 Slots",
+   "name_key": "pciex1slots",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_m.2",
+   "field_name": "M.2 Slots",
+   "name_key": "m2slots",
+   "data_type": "Text string",
+   "examples": [
+    "Slot 1: 4× PCIe 5.0 (2280/2260) | Slot 2: 4× PCIe 4.0 (22110/2280/2260) | Slot 3: 4× PCIe 4.0 (2280/2260/2242) | Slot 4: 4× PCIe 4.0/SATA (2280/2260/2242)"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_io-panel",
+   "field_name": "IO Panel",
+   "name_key": "iopanel",
+   "data_type": "Text string",
+   "examples": [
+    "1× Type-C | 1× USB 3.2 | 2× USB 3.2 | 4× USB 2.0",
+    "4× USB 3.2 | 2× USB 2.0 | 3× Audio 3.5mm",
+    "4× USB 3.1",
+    "1× USB 2.0",
+    "3× Audio 3.5mm",
+    "1× Type-C",
+    "1× S/PDIF-Out",
+    "8× USB 2.0"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_front-panel",
+   "field_name": "Front Panel",
+   "name_key": "frontpanel",
+   "data_type": "Text string",
+   "examples": [
+    "1× Type-C | 2× USB 3.2 | 4× USB 2.0",
+    "1× USB 3.2",
+    "2× USB 2.0",
+    "1× Audio 3.5mm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_rear-panel",
+   "field_name": "Rear Panel",
+   "name_key": "rearpanel",
+   "data_type": "Text string",
+   "examples": [
+    "1× Type-C | 2× USB 3.2 | 4× USB 2.0",
+    "1× USB 3.2",
+    "2× USB 2.0",
+    "1× Audio 3.5mm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-slots_display-ports",
+   "field_name": "Display Ports",
+   "name_key": "displayports",
+   "data_type": "Text string",
+   "examples": [
+    "1× DisplayPort | 1× HDMI 2.1",
+    "1× HDMI 2.0",
+    "1× VGA",
+    "1× Type-C",
+    "1× Intel Thunderbolt 4"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-onboard_audio",
+   "field_name": "Onboard audio chipset",
+   "name_key": "onboardaudiochipset",
+   "data_type": "Text string",
+   "examples": [
+    "Realtek ALC892 Codec",
+    "Realtek ALC1200 Codec",
+    "Realtek ALC897 Codec",
+    "Realtek ALC4080 Codec",
+    "ROG SupremeFX7.1-Channel High Definition Audio CODEC S1220A"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-onboard_audio-channels",
+   "field_name": "Onboard audio channels",
+   "name_key": "onboardaudiochannels",
+   "data_type": "Text string",
+   "examples": [
+    "7.1 Channel HD"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-onboard_ethernet-chipset",
+   "field_name": "Onboard ethernet chipset",
+   "name_key": "onboardethernetchipset",
+   "data_type": "Text string",
+   "examples": [
+    "Intel 2.5Gbps LAN",
+    "Realtek RTL8125BG 2.5Gbps LAN",
+    "Dragon RTL8125BG 2.5Gbps LAN"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-onboard_ethernet-speed",
+   "field_name": "Onboard ethernet speed",
+   "name_key": "onboardethernetspeed",
+   "data_type": "Text string",
+   "examples": [
+    "5Gbps"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-onboard_wireless-chipset",
+   "field_name": "Wireless chipset",
+   "name_key": "wirelesschipset",
+   "data_type": "Text string",
+   "examples": [
+    "Intel Killer E5000",
+    "Intel Killer BE1750",
+    "Intel 802.11ac"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-tech_raid",
+   "field_name": "Raid Support",
+   "name_key": "raidsupport",
+   "data_type": "Text string",
+   "examples": [
+    "RAID 0 | 1 | 5 | 10",
+    "RAID 1",
+    "RAID 5"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-tech_crossfire",
+   "field_name": "CrossFire Support",
+   "name_key": "crossfiresupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_motherboard-tech_slissfire",
+   "field_name": "SLI Support",
+   "name_key": "slisupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mobo_memory-features",
+   "field_name": "Motherboard Memory Features",
+   "name_key": "motherboardmemoryfeatures",
+   "data_type": "Text string",
+   "examples": [
+    "Intel XMP 3.0 | Dual Channel | ECC | Unbuffered",
+    "AMD EXPO | Non-ECC",
+    "Intel XMP 2.0 | Quad Channel"
+   ],
+   "rules": {
+    "raw": "≤255 characters",
+    "max_len": 255
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mobo_display-max-resolution",
+   "field_name": "Motherboard Display Max Resolution",
+   "name_key": "motherboarddisplaymaxresolution",
+   "data_type": "Text string",
+   "examples": [
+    "HDMI 2.1 (4K @120Hz) | DP (8K @60Hz)"
+   ],
+   "rules": {
+    "raw": "≤255 characters",
+    "max_len": 255
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mobo_internal-connectors-advanced",
+   "field_name": "Motherboard internal connectors",
+   "name_key": "motherboardinternalconnectors",
+   "data_type": "Text string",
+   "examples": [
+    "2× Addressable LED strip headers | 1× RGB LED strip header | 1× TPM header",
+    "1× CPU OPT header | 1× TPM header (2x6 pin)",
+    "1× Water cooling pump header | 1× Thunderbolt header | 1× M.2 Key E (WiFi)"
+   ],
+   "rules": {
+    "raw": "≤255 characters",
+    "max_len": 255
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mobo_front-usb-c-pd",
+   "field_name": "Type-C power delivery",
+   "name_key": "typecpowerdelivery",
+   "data_type": "Text string",
+   "examples": [
+    "30W",
+    "45W",
+    "60W",
+    "65W"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mobo_audio-spdif-output",
+   "field_name": "Motherboard audio output",
+   "name_key": "motherboardaudiooutput",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_memory-DRAM_total-capacity",
+   "field_name": "Memory Total Capacity",
+   "name_key": "memorytotalcapacity",
+   "data_type": "Text string",
+   "examples": [
+    "8GB",
+    "16GB",
+    "32GB",
+    "64GB",
+    "128GB",
+    "192GB",
+    "256GB",
+    "512GB",
+    "1TB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_memory-DRAM_dimms",
+   "field_name": "Number of DIMMs",
+   "name_key": "numberofdimms",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_memory-DRAM_series",
+   "field_name": "Series",
+   "name_key": "series",
+   "data_type": "Text string",
+   "examples": [
+    "Signature Line",
+    "Viper Steel",
+    "Pro Series",
+    "Standard",
+    "Future RGB",
+    "XTREME5"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_memory-DRAM_generation",
+   "field_name": "Memory Generation",
+   "name_key": "memorygeneration",
+   "data_type": "Text string",
+   "examples": [
+    "DDR3",
+    "DDR4",
+    "DDR5",
+    "DDR4 | DDR5"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_memory-DRAM_clock-speed",
+   "field_name": "Memory Clock Speed",
+   "name_key": "memoryclockspeed",
+   "data_type": "Text string",
+   "examples": [
+    "2666MHz",
+    "3200MHz",
+    "3600MHz",
+    "4800MHz",
+    "5600MHz",
+    "6000MHz",
+    "8000MHz",
+    "3600MHz | 5600MHz"
+   ],
+   "rules": {
+    "raw": "DO NOT use MT/s as it is a different measurement",
+    "banned": [
+     "MT/s"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_memory-DRAM_tdp",
+   "field_name": "Memory TDP",
+   "name_key": "memorytdp",
+   "data_type": "Text string",
+   "examples": [
+    "2.13W",
+    "3W",
+    "4.88W",
+    "5.25W",
+    "10.5W",
+    "12W"
+   ],
+   "rules": {
+    "raw": "≥5 characters",
+    "min_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_form-factor",
+   "field_name": "Storage Form Factor",
+   "name_key": "storageformfactor",
+   "data_type": "Text string",
+   "examples": [
+    "HDD 2.5-inch",
+    "HDD 3.5-inch",
+    "M.2 2280",
+    "M.2 2230",
+    "M.2 2242",
+    "M.2 22110"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_capacity",
+   "field_name": "Storage Capacity",
+   "name_key": "storagecapacity",
+   "data_type": "Text string",
+   "examples": [
+    "128GB",
+    "512GB",
+    "1TB",
+    "2TB",
+    "4TB"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_series",
+   "field_name": "Storage Series",
+   "name_key": "storageseries",
+   "data_type": "Text string",
+   "examples": [
+    "P300",
+    "P310",
+    "E100",
+    "T500",
+    "T700",
+    "T705"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_interface",
+   "field_name": "Storage Protocol",
+   "name_key": "storageprotocol",
+   "data_type": "Text string",
+   "examples": [
+    "SATA",
+    "NVMe"
+   ],
+   "rules": {
+    "raw": "≤4characters",
+    "max_len": 4
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_supported-pci-express",
+   "field_name": "Supported PCI Express",
+   "name_key": "supportedpciexpress",
+   "data_type": "Text string",
+   "examples": [
+    "PCIe 3.0",
+    "PCIe 4.0",
+    "PCIe 5.0"
+   ],
+   "rules": {
+    "raw": "≥8 characters",
+    "min_len": 8
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_read-speeds",
+   "field_name": "Storage Read speed",
+   "name_key": "storagereadspeed",
+   "data_type": "Text string",
+   "examples": [
+    "1,600MB/s",
+    "2,450MB/s",
+    "4,700MB/s",
+    "7,300MB/s",
+    "11,000MB/s",
+    "14,800MB/s"
+   ],
+   "rules": {
+    "raw": "≤10 characters",
+    "max_len": 10
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_write-speeds",
+   "field_name": "Storage Write speed",
+   "name_key": "storagewritespeed",
+   "data_type": "Text string",
+   "examples": [
+    "600MB/s",
+    "1,650MB/s",
+    "3,500MB/s",
+    "7,000MB/s",
+    "10,200MB/s",
+    "13,700MB/s"
+   ],
+   "rules": {
+    "raw": "≤10 characters",
+    "max_len": 10
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_storage-m.2_tdp",
+   "field_name": "Storage TDP",
+   "name_key": "storagetdp",
+   "data_type": "Text string",
+   "examples": [
+    "1.3W",
+    "3.66W",
+    "4.9W",
+    "8.4W",
+    "12.5W",
+    "15W"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_form-factor",
+   "field_name": "PSU Form Factor",
+   "name_key": "psuformfactor",
+   "data_type": "Text string",
+   "examples": [
+    "M-ATX",
+    "ATX",
+    "ATX3.0",
+    "ATX3.1",
+    "E-ATX",
+    "SFX",
+    "mATX",
+    "mITX"
+   ],
+   "rules": {
+    "raw": "≤7 characters",
+    "max_len": 7
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_total-power",
+   "field_name": "PSU Total Power",
+   "name_key": "psutotalpower",
+   "data_type": "Text string",
+   "examples": [
+    "350W",
+    "400W",
+    "450W",
+    "500W",
+    "550W",
+    "650W",
+    "750W",
+    "850W",
+    "1000W",
+    "1200W"
+   ],
+   "rules": {
+    "raw": "≤5 characters",
+    "max_len": 5
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_modularity",
+   "field_name": "PSU Modularity",
+   "name_key": "psumodularity",
+   "data_type": "Text string",
+   "examples": [
+    "Non-Modular",
+    "Semi-Modular",
+    "Fully-Modular"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_energy-efficiency",
+   "field_name": "PSU Energy Efficiency",
+   "name_key": "psuenergyefficiency",
+   "data_type": "Text string",
+   "examples": [
+    "Energy Saving",
+    "80 Plus Bronze",
+    "80 Plus Standard",
+    "80 Plus Gold",
+    "80 Plus Platinum"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu-slots_sata",
+   "field_name": "PSU SATA",
+   "name_key": "psusata",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
+    "10",
+    "12",
+    "14",
+    "16"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu-slots_molex",
+   "field_name": "PSU MOLEX",
+   "name_key": "psumolex",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu-slots_floppy",
+   "field_name": "PSU Floppy",
+   "name_key": "psufloppy",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu-slots_cooling",
+   "field_name": "PSU Cooling",
+   "name_key": "psucooling",
+   "data_type": "Text string",
+   "examples": [
+    "120mm FDB Silent Fan",
+    "92mm Silent Fan",
+    "135mm Dual Ball Bearing Fan",
+    "135mm Axial-Tech Fan",
+    "120mm HYB Fan"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_8pin44-power-connector",
+   "field_name": "8-Pin Power Connectors (4+4)",
+   "name_key": "8pinpowerconnectors44",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_8pin64-power-connector",
+   "field_name": "8-Pin Power Connectors (6+4)",
+   "name_key": "8pinpowerconnectors64",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_basic204-power-connector",
+   "field_name": "Basic Power Connectors (20+4)",
+   "name_key": "basicpowerconnectors204",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_16pin122-power-connector",
+   "field_name": "16-Pin Power Connectors (12+2)",
+   "name_key": "16pinpowerconnectors122",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_16pin26-power-connector",
+   "field_name": "16-Pin Power Connectors (2x6)",
+   "name_key": "16pinpowerconnectors2x6",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_pcie5.0-16pin-300w-power-connector",
+   "field_name": "PCIe 5.0 16-Pin 12VHPWR (300W)",
+   "name_key": "pcie5016pin12vhpwr300w",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_pcie5.1-16pin-300w-power-connector",
+   "field_name": "PCIe 5.1 16-Pin 12VHPWR (300W)",
+   "name_key": "pcie5116pin12vhpwr300w",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_pcie5.1-16pin-450w-power-connector",
+   "field_name": "PCIe 5.1 16-Pin 12VHPWR (450W)",
+   "name_key": "pcie5116pin12vhpwr450w",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_psu_pcie5.1-16pin-600w-power-connector",
+   "field_name": "PCIe 5.1 16-Pin 12VHPWR (600W)",
+   "name_key": "pcie5116pin12vhpwr600w",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_panel-size",
+   "field_name": "Panel size",
+   "name_key": "panelsize",
+   "data_type": "Text string",
+   "examples": [
+    "14-inch",
+    "15.6-inch",
+    "17-inch",
+    "19-inch",
+    "21-inch",
+    "24-inch",
+    "27-inch",
+    "34-inch"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_panel-form-factor",
+   "field_name": "Panel form factor",
+   "name_key": "panelformfactor",
+   "data_type": "Text string",
+   "examples": [
+    "Flat",
+    "Curved"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_panel-curvature",
+   "field_name": "Panel curvature",
+   "name_key": "panelcurvature",
+   "data_type": "Text string",
+   "examples": [
+    "1000R",
+    "1500R",
+    "1800R",
+    "2000R"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_panel-type",
+   "field_name": "Panel type",
+   "name_key": "paneltype",
+   "data_type": "Text string",
+   "examples": [
+    "VA",
+    "IPS"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_panel-aspect-ratio",
+   "field_name": "Panel aspect ratio",
+   "name_key": "panelaspectratio",
+   "data_type": "Text string",
+   "examples": [
+    "16:9",
+    "21:9"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_panel-active-display-size",
+   "field_name": "Panel active display size (HxV)",
+   "name_key": "panelactivedisplaysizehxv",
+   "data_type": "Text string",
+   "examples": [
+    "52.70 × 29.64cm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_brightness-typical",
+   "field_name": "Brightness (Typical)",
+   "name_key": "brightnesstypical",
+   "data_type": "Text string",
+   "examples": [
+    "200 cd/m²",
+    "250 cd/m²",
+    "300 cd/m²",
+    "400 cd/m²"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_brightness-peak",
+   "field_name": "Brightness (Peak)",
+   "name_key": "brightnesspeak",
+   "data_type": "Text string",
+   "examples": [
+    "200 cd/m²",
+    "250 cd/m²",
+    "300 cd/m²",
+    "400 cd/m²"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_brightness-min",
+   "field_name": "Brightness (Minimum)",
+   "name_key": "brightnessminimum",
+   "data_type": "Text string",
+   "examples": [
+    "200 cd/m²",
+    "250 cd/m²",
+    "300 cd/m²",
+    "400 cd/m²"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_contrast-ratio-static",
+   "field_name": "Contrast ratio (Typical)",
+   "name_key": "contrastratiotypical",
+   "data_type": "Text string",
+   "examples": [
+    "1000:1"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_contrast-ratio-dynamic",
+   "field_name": "Contrast ratio (Dynamic)",
+   "name_key": "contrastratiodynamic",
+   "data_type": "Text string",
+   "examples": [
+    "Mega"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_high-dynamic-range-hdr",
+   "field_name": "High dynamic range (HDR)",
+   "name_key": "highdynamicrangehdr",
+   "data_type": "Text string",
+   "examples": [
+    "True Black 400"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_resolution",
+   "field_name": "Resolution",
+   "name_key": "resolution",
+   "data_type": "Text string",
+   "examples": [
+    "1920 × 1080"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_response-time",
+   "field_name": "Response time",
+   "name_key": "responsetime",
+   "data_type": "Text string",
+   "examples": [
+    "0.3ms (GTG)",
+    "1ms (GTG)",
+    "5ms (GTG)",
+    "8ms (GTG)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_viewing-angle",
+   "field_name": "Viewing angle",
+   "name_key": "viewingangle",
+   "data_type": "Text string",
+   "examples": [
+    "178°/178°"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_signal-frequency",
+   "field_name": "Signal frequency",
+   "name_key": "signalfrequency",
+   "data_type": "Text string",
+   "examples": [
+    "30~390KHz/48~240Hz"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_colour-support",
+   "field_name": "Colour support",
+   "name_key": "coloursupport",
+   "data_type": "Text string",
+   "examples": [
+    "16.7 million colours"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_colour-gamut-ntsc-1976",
+   "field_name": "Colour gamut (NTSC 1976)",
+   "name_key": "colourgamutntsc1976",
+   "data_type": "Text string",
+   "examples": [
+    "72% (CIE 1931)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_colour-gamut-dci-coverage",
+   "field_name": "Colour gamut (DCI coverage)",
+   "name_key": "colourgamutdcicoverage",
+   "data_type": "Text string",
+   "examples": [
+    "99.3% (DCI-P3)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_colour-gamut-sRGB-coverage",
+   "field_name": "Colour gamut (sRGB coverage)",
+   "name_key": "colourgamutsrgbcoverage",
+   "data_type": "Text string",
+   "examples": [
+    "139.1% (sRGB)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_colour-gamut-adobe-coverage",
+   "field_name": "Colour gamut (Adobe coverage)",
+   "name_key": "colourgamutadobecoverage",
+   "data_type": "Text string",
+   "examples": [
+    "97.8% (Adobe)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display_refresh-rate",
+   "field_name": "Refresh rate",
+   "name_key": "refreshrate",
+   "data_type": "Text string",
+   "examples": [
+    "75Hz",
+    "100Hz",
+    "120Hz",
+    "180Hz",
+    "200Hz"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_eco-saving-plus",
+   "field_name": "Eco Saving Plus",
+   "name_key": "ecosavingplus",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_eye-saver-mode",
+   "field_name": "Eye Saver Mode",
+   "name_key": "eyesavermode",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_flicker-free",
+   "field_name": "Flicker Free",
+   "name_key": "flickerfree",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_game-mode",
+   "field_name": "Game Mode",
+   "name_key": "gamemode",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_image-size",
+   "field_name": "Image Size",
+   "name_key": "imagesize",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_windows-certification",
+   "field_name": "Windows Certification",
+   "name_key": "windowscertification",
+   "data_type": "Text string",
+   "examples": [
+    "Windows 10",
+    "Windows 11"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_freesync",
+   "field_name": "FreeSync",
+   "name_key": "freesync",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-feature_off-timer-plus",
+   "field_name": "Off timer plus",
+   "name_key": "offtimerplus",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-interface_d-sub",
+   "field_name": "D-Sub",
+   "name_key": "dsub",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-interface_hdmi",
+   "field_name": "HDMI",
+   "name_key": "hdmi",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-interface_hdmi-version",
+   "field_name": "HDMI version",
+   "name_key": "hdmiversion",
+   "data_type": "Numeral",
+   "examples": [
+    "1.4",
+    "2.0",
+    "2.1"
+   ],
+   "rules": {
+    "raw": "≤3 characters",
+    "max_len": 3
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-interface_audio",
+   "field_name": "Audio",
+   "name_key": "audio",
+   "data_type": "Text string",
+   "examples": [
+    "1× Audio 3.5mm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-interface_usb",
+   "field_name": "USB",
+   "name_key": "usb",
+   "data_type": "Text string",
+   "examples": [
+    "1× USB Type-C 2.0 (98W PD) | 1× USB 2.0 | 1× USB 3.1",
+    "1× Type-C 2.0 (120W PD)",
+    "1× USB 2.0 | 1× USB 3.1"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-design_stand-type",
+   "field_name": "Stand type",
+   "name_key": "standtype",
+   "data_type": "Text string",
+   "examples": [
+    "Simple"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-design_adj-tilt",
+   "field_name": "Tilt adjustment",
+   "name_key": "tiltadjustment",
+   "data_type": "Text string",
+   "examples": [
+    "-5.0° ~20.0° (±2.0°)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-design_adj-swivel",
+   "field_name": "Swivel adjustment",
+   "name_key": "swiveladjustment",
+   "data_type": "Text string",
+   "examples": [
+    "-30.0° ~30.0° (±2.0°)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-design_adj-height",
+   "field_name": "Height adjustment",
+   "name_key": "heightadjustment",
+   "data_type": "Text string",
+   "examples": [
+    "0 ~100 mm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-design_wall-mount",
+   "field_name": "VESA wall mount",
+   "name_key": "vesawallmount",
+   "data_type": "Text string",
+   "examples": [
+    "7.5 × 7.5 cm | 10 × 10 cm",
+    "7.5 × 7.5 cm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-design_kensington-lock",
+   "field_name": "Kensington lock slot",
+   "name_key": "kensingtonlockslot",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-power_input",
+   "field_name": "Power input",
+   "name_key": "powerinput",
+   "data_type": "Text string",
+   "examples": [
+    "12V⎓3.0A (100~240V, 50/60Hz)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-power_consumption-rated-max",
+   "field_name": "Rated power consumption (Max)",
+   "name_key": "ratedpowerconsumptionmax",
+   "data_type": "Text string",
+   "examples": [
+    "25W"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-power_consumption-typical",
+   "field_name": "Power consumption (Typical)",
+   "name_key": "powerconsumptiontypical",
+   "data_type": "Text string",
+   "examples": [
+    "16W"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-power_consumption-dpms",
+   "field_name": "Power consumption (DPMS)",
+   "name_key": "powerconsumptiondpms",
+   "data_type": "Text string",
+   "examples": [
+    "0.3W"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-power_consumption-off",
+   "field_name": "Power consumption (Off mode)",
+   "name_key": "powerconsumptionoffmode",
+   "data_type": "Text string",
+   "examples": [
+    "0.3W"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-power_adapter-type",
+   "field_name": "Power adapter type",
+   "name_key": "poweradaptertype",
+   "data_type": "Text string",
+   "examples": [
+    "External power adaptor & cable"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-physical_dims-with-stand",
+   "field_name": "Dimension with stand (W×H×D)",
+   "name_key": "dimensionwithstandwhd",
+   "data_type": "Text string",
+   "examples": [
+    "53.9 × 42.2 × 21.7 cm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-physical_dims-without-stand",
+   "field_name": "Dimension without stand (W×H×D)",
+   "name_key": "dimensionwithoutstandwhd",
+   "data_type": "Text string",
+   "examples": [
+    "53.9 × 49.9 × 32.1 cm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-physical_weight-with-stand",
+   "field_name": "Weight with stand",
+   "name_key": "weightwithstand",
+   "data_type": "Text string",
+   "examples": [
+    "2400g",
+    "4200g"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-physical_weight-without-stand",
+   "field_name": "Weight without stand",
+   "name_key": "weightwithoutstand",
+   "data_type": "Text string",
+   "examples": [
+    "2400g",
+    "4200g"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_accessory_display-power_cable-length",
+   "field_name": "Power cable length",
+   "name_key": "powercablelength",
+   "data_type": "Numeral",
+   "examples": [
+    "1.0m",
+    "1.5m",
+    "2.0m"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-cable_hdmi-cable",
+   "field_name": "HDMI cable length",
+   "name_key": "hdmicablelength",
+   "data_type": "Numeral",
+   "examples": [
+    "1.0m",
+    "1.5m",
+    "2.0m"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-support_amd-freesync",
+   "field_name": "AMD FreeSync support",
+   "name_key": "amdfreesyncsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-support_nvidia-gsync",
+   "field_name": "NVIDIA G-Sync support",
+   "name_key": "nvidiagsyncsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-certification_tuv-blue-light",
+   "field_name": "TÜV Low Blue Light Certification",
+   "name_key": "tvlowbluelightcertification",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_display-adaptive-sync",
+   "field_name": "Adaptive Sync support",
+   "name_key": "adaptivesyncsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-frequency-range",
+   "field_name": "Frequency range",
+   "name_key": "frequencyrange",
+   "data_type": "Text string",
+   "examples": [
+    "2402MHz-2480MHz"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-max-power-radio-frequency",
+   "field_name": "Power radio frequency (max)",
+   "name_key": "powerradiofrequencymax",
+   "data_type": "Text string",
+   "examples": [
+    "-8.68dBm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-sensitivity-max",
+   "field_name": "DPI (max)",
+   "name_key": "dpimax",
+   "data_type": "Text string",
+   "examples": [
+    "1000DPI",
+    "2000DPI",
+    "4000PI",
+    "8000DPI",
+    "20000DPI"
+   ],
+   "rules": {
+    "raw": "Single-select choice only, ≤8 characters",
+    "max_len": 8,
+    "single_select": true,
+    "allowed": [
+     "1000DPI",
+     "2000DPI",
+     "4000PI",
+     "8000DPI",
+     "20000DPI"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-sensitivity-levels",
+   "field_name": "DPI levels",
+   "name_key": "dpilevels",
+   "data_type": "Text string",
+   "examples": [
+    "5× DPI levels (250/800/1600/3200/14000)"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-hand-orientation",
+   "field_name": "Hand orientation",
+   "name_key": "handorientation",
+   "data_type": "Text string",
+   "examples": [
+    "Right-handed",
+    "Left-handed",
+    "Ambidextrous"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Right-handed",
+     "Left-handed",
+     "Ambidextrous"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-button-quantity",
+   "field_name": "Button quantity",
+   "name_key": "buttonquantity",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-sensor",
+   "field_name": "Sensor",
+   "name_key": "sensor",
+   "data_type": "Text string",
+   "examples": [
+    "PixArt PMW3391"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-clicks-lifespan",
+   "field_name": "Lifespan (clicks)",
+   "name_key": "lifespanclicks",
+   "data_type": "Text string",
+   "examples": [
+    "20 million clicks"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-silent",
+   "field_name": "Silent support",
+   "name_key": "silentsupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-features-additional",
+   "field_name": "Additional features",
+   "name_key": "additionalfeatures",
+   "data_type": "Text string",
+   "examples": [
+    "Ergonomic",
+    "Lightweight",
+    "Rechargeable",
+    "Ergonomic | Lightweight | Rechargeable"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_mouse-side-scroller",
+   "field_name": "Side scroller support",
+   "name_key": "sidescrollersupport",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-ac-adapter",
+   "field_name": "AC adapter",
+   "name_key": "acadapter",
+   "data_type": "Text string",
+   "examples": [
+    "60W AC adapter",
+    "90W AC adapter"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-power-cable",
+   "field_name": "Power cable",
+   "name_key": "powercable",
+   "data_type": "Text string",
+   "examples": [
+    "1m Cloverleaf power cable",
+    "1.5m Cloverleaf power cable"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-software-operating-system",
+   "field_name": "Operating system",
+   "name_key": "operatingsystem",
+   "data_type": "Text string",
+   "examples": [
+    "Windows 11 Home",
+    "Windows 11 Pro"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-software-security",
+   "field_name": "Security software",
+   "name_key": "securitysoftware",
+   "data_type": "Text string",
+   "examples": [
+    "Norton 360 1-year license, 3-users"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-software-other",
+   "field_name": "Other software",
+   "name_key": "othersoftware",
+   "data_type": "Text string",
+   "examples": [
+    "Microsoft Office 365"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-integrated-webcam",
+   "field_name": "Webcam (integrated)",
+   "name_key": "webcamintegrated",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-integrated-touchpad",
+   "field_name": "TouchPad (integrated)",
+   "name_key": "touchpadintegrated",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-integrated-fingerprint-reader",
+   "field_name": "Fingerprint reader (integrated)",
+   "name_key": "fingerprintreaderintegrated",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-integrated-speakers",
+   "field_name": "Speakers (integrated)",
+   "name_key": "speakersintegrated",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_laptops-integrated-microphone",
+   "field_name": "Microphone (integrated)",
+   "name_key": "microphoneintegrated",
+   "data_type": "Text string",
+   "examples": [
+    "Yes",
+    "No"
+   ],
+   "rules": {
+    "raw": "Single-select choice only",
+    "single_select": true,
+    "allowed": [
+     "Yes",
+     "No"
+    ]
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-case-type",
+   "field_name": "Chassis type",
+   "name_key": "chassistype",
+   "data_type": "Text string",
+   "examples": [
+    "Full tower",
+    "Mid tower",
+    "Mini tower",
+    "Small form factor"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-motherboard-compatibility",
+   "field_name": "Chassis motherboard compatibility",
+   "name_key": "chassismotherboardcompatibility",
+   "data_type": "Text string",
+   "examples": [
+    "M-ATX",
+    "ATX",
+    "ATX3.0",
+    "ATX3.1",
+    "E-ATX",
+    "SFX",
+    "mATX",
+    "mITX"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-expansion-slots",
+   "field_name": "Chassis expansion slots",
+   "name_key": "chassisexpansionslots",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-gpu-max-length",
+   "field_name": "Chassis GPU max length",
+   "name_key": "chassisgpumaxlength",
+   "data_type": "Text string",
+   "examples": [
+    "Up to 36 cm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-cpu-cooler-height",
+   "field_name": "Chassis CPU cooler max height",
+   "name_key": "chassiscpucoolermaxheight",
+   "data_type": "Text string",
+   "examples": [
+    "Up to 16 cm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-psu-form-factor",
+   "field_name": "Chassis PSU form factor",
+   "name_key": "chassispsuformfactor",
+   "data_type": "Text string",
+   "examples": [
+    "M-ATX",
+    "ATX",
+    "ATX3.0",
+    "ATX3.1",
+    "E-ATX",
+    "SFX",
+    "mATX",
+    "mITX"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-psu-orientation",
+   "field_name": "Chassis PSU orientation",
+   "name_key": "chassispsuorientation",
+   "data_type": "Text string",
+   "examples": [
+    "Bottom",
+    "Rear",
+    "Top"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-fan-mount-support",
+   "field_name": "Chassis fan mount support",
+   "name_key": "chassisfanmountsupport",
+   "data_type": "Text string",
+   "examples": [
+    "3× 120mm front",
+    "2× 140mm top",
+    "1× 120mm rear",
+    "2× 120mm front | 1× 120mm rear"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-fan-mounts",
+   "field_name": "Chassis fan mounts",
+   "name_key": "chassisfanmounts",
+   "data_type": "Text string",
+   "examples": [
+    "2× 120mm front | 1× 140mm top | 1× 120mm rear",
+    "2× 120mm front",
+    "2× 140mm top"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-radiator-support",
+   "field_name": "Chassis radiator support",
+   "name_key": "chassisradiatorsupport",
+   "data_type": "Text string",
+   "examples": [
+    "1× 120mm rear",
+    "1× 240mm front",
+    "1× 280mm front",
+    "1× 360mm in front, top, or rear"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-airflow-optimisation",
+   "field_name": "Chassis airflorw optimisation",
+   "name_key": "chassisairflorwoptimisation",
+   "data_type": "Text string",
+   "examples": [
+    "Mesh panels",
+    "Dust filters"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-35inch-hdd-bays",
+   "field_name": "Chassis 3.5-inch HDD bays",
+   "name_key": "chassis35inchhddbays",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-25inch-ssd-bays",
+   "field_name": "Chassis 2.5-inch SSD bays",
+   "name_key": "chassis25inchssdbays",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-525inch-odd-bays",
+   "field_name": "Chassis 5.25-inch ODD bays",
+   "name_key": "chassis525inchoddbays",
+   "data_type": "Numeral",
+   "examples": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+   ],
+   "rules": {
+    "raw": "≤2 characters",
+    "max_len": 2
+   },
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-ports",
+   "field_name": "Chassis ports",
+   "name_key": "chassisports",
+   "data_type": "Text string",
+   "examples": [
+    "1× Type-C | 2× USB 3.2 | 4× USB 2.0",
+    "1× USB 3.2",
+    "2× USB 2.0",
+    "1× Audio 3.5mm"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-controls",
+   "field_name": "Chassis controls",
+   "name_key": "chassiscontrols",
+   "data_type": "Text string",
+   "examples": [
+    "Power button",
+    "Reset button",
+    "RGB lighting button"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-cable-management",
+   "field_name": "Chassis cable management",
+   "name_key": "chassiscablemanagement",
+   "data_type": "Text string",
+   "examples": [
+    "Routing cutouts"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_chassis-aesthetics",
+   "field_name": "Chassis aesthetics",
+   "name_key": "chassisaesthetics",
+   "data_type": "Text string",
+   "examples": [
+    "Tempered glass side panel"
+   ],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-fan-size",
+   "field_name": "Cooler fan size",
+   "name_key": "coolerfansize",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-socket-support",
+   "field_name": "Cooler socket support",
+   "name_key": "coolersocketsupport",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-height",
+   "field_name": "Cooler height",
+   "name_key": "coolerheight",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-fan-space",
+   "field_name": "Cooler fan space",
+   "name_key": "coolerfanspace",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-power-connector",
+   "field_name": "Cooler power connector",
+   "name_key": "coolerpowerconnector",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-pump-connector",
+   "field_name": "Cooler pump connector",
+   "name_key": "coolerpumpconnector",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_cooler-tdp",
+   "field_name": "Cooler TDP",
+   "name_key": "coolertdp",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-size",
+   "field_name": "Case fan size",
+   "name_key": "casefansize",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-space",
+   "field_name": "Case fan space",
+   "name_key": "casefanspace",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-lighting-power-connector",
+   "field_name": "Case fan lighting power connector",
+   "name_key": "casefanlightingpowerconnector",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-controller-power-connector",
+   "field_name": "Case fan controller power connector",
+   "name_key": "casefancontrollerpowerconnector",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-power-connector",
+   "field_name": "Case fan power connector",
+   "name_key": "casefanpowerconnector",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-controller-3pin",
+   "field_name": "Case fan controller 3-pin",
+   "name_key": "casefancontroller3pin",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-controller-4pin",
+   "field_name": "Case fan controller 4-pin",
+   "name_key": "casefancontroller4pin",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  },
+  {
+   "field_id": "product_attribute_case-fan-tdp",
+   "field_name": "Case fan TDP",
+   "name_key": "casefantdp",
+   "data_type": "",
+   "examples": [],
+   "rules": {},
+   "source_tab": "Examples"
+  }
+ ]
+}
