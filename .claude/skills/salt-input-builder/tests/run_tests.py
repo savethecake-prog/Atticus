@@ -644,10 +644,25 @@ def test_standardise_style():
     f = lambda h, v: S.standardise_value(h, v)[0]
     check("style: weight no space", f("Product weight:", "23.3 kg") == "23.3kg")
     check("style: lone dimension no space", f("Seat depth:", "520 mm") == "520mm")
-    check("style: dimension triple, x spaced, unit attached to last",
-          f("Product dimensions:", "1300 × 690 × 640 mm") == "1300 x 690 x 640mm")
-    check("style: cm triple scaled to mm",
-          f("Packaging dimensions:", "76 x 63.5 x 37.5 cm") == "760 x 635 x 375mm")
+    check("style: dimension triple compacted, lowercase x, unit attached to last",
+          f("Product dimensions:", "1300 × 690 × 640 mm") == "1300x690x640mm")
+    check("style: cm triple scaled to mm and compacted",
+          f("Packaging dimensions:", "76 x 63.5 x 37.5 cm") == "760x635x375mm")
+    # compact standard (Christopher 2026-06-11): measurements are one machine-readable chunk
+    check("style: weight <1kg becomes grams (no decimals)",
+          f("Product weight:", "0.5 kg") == "500g")
+    check("style: weight 0.25kg -> grams", f("Product weight:", "0.25kg") == "250g")
+    check("style: grams >=1000 become kg", f("Packaging weight:", "1500 g") == "1.5kg")
+    check("style: grams rounded, no decimals (>=0.5 up)", f("Product weight:", "183.5 g") == "184g")
+    check("style: resolution compacted (unitless, not scaled)",
+          f("Resolution:", "1920 x 1080") == "1920x1080")
+    check("style: refresh rate compacted", f("Refresh rate:", "165 Hz") == "165Hz")
+    check("style: frequency compacted", f("CPU base frequency:", "3.40 GHz") == "3.40GHz")
+    check("style: brightness compacted (cd/m² intact)",
+          f("Brightness (Typical):", "250 cd/m²") == "250cd/m²")
+    check("style: capacity compacted", f("Memory capacity:", "16 GB") == "16GB")
+    check("style: natural language not compacted",
+          f("Front camera:", "8 megapixel") == "8 megapixel")
     check("style: angle range spelled out, + dropped",
           f("Backrest incline:", "100° to 125°") == "100 to 125 degrees")
     check("style: signed angle range, + dropped, - kept",
