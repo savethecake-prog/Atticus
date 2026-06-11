@@ -80,11 +80,21 @@ Writer / tester / auditor restructure (Decision C).
 - CLAUDE.md: codified the writer/tester division and the byte-for-byte convention;
   refreshed the stale "60 tests" reference. Suite 163 → 165.
 
-### Still open (smaller, for a later pass)
-- `audit.py` still saves shading/notes into the production workbook in place; the
-  annotations are value-preserving (never overwrite a value) but a stricter reading
-  of "the tester never writes" would route them to a separate annotated copy.
-  Flagged, not changed — would touch the audit test contract.
+## Stage 4 — DONE (branch: claude/finish-deferrals-stage4) — finish the deferrals
+Everything tidied before running a test batch.
+- Per-field units: only the required Product/Packaging dimension fields scale cm/m
+  to mm; every other dimension field (GPU length, monitor physical dims) keeps its
+  native unit and is compact-only (`_SCALE_DIM` gate in `standardise.py`).
+- Per-field comma policy: contrast ratio drops thousands separators ("1,000:1" ->
+  "1000:1"); storage speeds keep theirs (`_CONTRAST`/`_THOUSANDS`).
+- The tester never writes the work: `audit.py` now writes shading/notes to a
+  SEPARATE `<built>_audited.xlsx` copy and leaves the built sheet byte-for-byte
+  (test asserts the source md5 is unchanged). Auditor agent updated.
+- Suite 165 -> 171, all green.
+
+### Resolved
+The previously-open "audit writes in place" item is now closed (separate copy).
+No deferrals remain open from this workstream; ready for a test batch.
 
 ## Flagged to Christopher (not silently absorbed)
 - Schema DB row 17 labels dimensions "in centimetres (mm)" — contradictory; unit is mm.

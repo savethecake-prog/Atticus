@@ -10,12 +10,14 @@ Checks (core, domain-agnostic):
   D. Link liveness     - source link dead or unverified
 Plus domain-pack checks (e.g. SKU decode vs fields, cross-field logic, plausibility).
 
-Discrepant cells are shaded with the 'unverifiable' colour and an
-"ACCURACY CHECK" note is appended to the existing notes (never overwritten).
-A Markdown report is written for the human.
+The tester never writes the work: the built workbook is read, never modified.
+Discrepant cells are shaded with the 'unverifiable' colour and an "ACCURACY CHECK"
+note appended (never overwriting a value) in a SEPARATE annotated copy
+(<built>_audited.xlsx); the production sheet is left byte-for-byte. A Markdown
+report is written for the human, and schema-conformance findings are report-only.
 """
 from __future__ import annotations
-import sys, datetime, copy
+import sys, os, datetime, copy
 from openpyxl import load_workbook
 from openpyxl.styles import Font
 import common, ledger as L, profile_engine
@@ -47,9 +49,17 @@ def _gtin_ok(code):
     return (10 - total % 10) % 10 == int(s[-1])
 
 
-def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=None):
+def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=None,
+          annotated_path=None):
+    """Re-derive and report. The tester never writes the work: the built workbook
+    is read, never modified. Shading/notes are written to a SEPARATE annotated copy
+    (``annotated_path``, defaulting to ``<built>_audited.xlsx``) so the production
+    sheet the builder owns is left byte-for-byte. Returns the findings list."""
     colours = {**DEFAULT_COLOURS, **(colours or {})}
     profiles = profiles or {}
+    if annotated_path is None:
+        base, ext = os.path.splitext(built_path)
+        annotated_path = f"{base}_audited{ext}"
     entries = L.load(ledger_path)
     by_cell = {(e["tab"], e["row"], e["column"]): e for e in entries}
     wb = load_workbook(built_path)
@@ -201,10 +211,11 @@ def audit(built_path, schema, ledger_path, out_report, colours=None, profiles=No
                 nc.font = Font(**BODY_FONT)
                 nc.alignment = Alignment(**TOP_WRAP)
 
-    wb.save(built_path)
+    wb.save(annotated_path)            # the annotated COPY; built_path is left untouched
     _report(out_report, findings, today)
     sev_counts = {s: sum(1 for f in findings if f[3] == s) for s in ("HARD", "SOFT", "SCHEMA")}
-    print(f"AUDIT done: {len(findings)} findings {sev_counts} -> {out_report}")
+    print(f"AUDIT done: {len(findings)} findings {sev_counts} -> {out_report} "
+          f"(annotated copy: {annotated_path}; source left unmodified)")
     return findings
 
 

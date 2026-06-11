@@ -80,6 +80,13 @@ _DIM = re.compile(
     r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+(?:[.,]\d+)?)"
     r"(?:\s*[x×]\s*(\d+(?:[.,]\d+)?))?\s*(mm|cm|m)?\b", re.I)
 _LEN_ONE = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s+(mm|cm|m)\b", re.I)  # lone "520 mm" -> "520mm"
+# only the required Product/Packaging dimension fields scale cm/m to mm; every
+# other dimension field keeps its native (often cm) unit and is compact-only.
+_SCALE_DIM = re.compile(r"(product|packaging)\s*dimension", re.I)
+# contrast ratio carries no thousands separator ("1,000:1" -> "1000:1"); other
+# fields (e.g. storage speeds) keep their commas, so this is keyed to contrast.
+_CONTRAST = re.compile(r"contrast", re.I)
+_THOUSANDS = re.compile(r"(?<=\d),(?=\d)")
 _WT = re.compile(r"(?<![\d.])(\d+(?:[.,]\d+)?)\s*([kK][gG]|g)\b")  # 'g' lowercase only: "4G"/"5G" network is not grams
 # compact the space between a number and an attached unit, for machine-readable
 # ingestion (Christopher's compact rule). A closed whitelist of units only, so
@@ -120,14 +127,19 @@ def _scale(s, factor):
     return str(int(v) if v == int(v) else round(v, 3))
 
 
-def _norm_dim(m):
+def _norm_dim(m, scale_mm=True):
     a, b, c, unit = m.group(1), m.group(2), m.group(3), (m.group(4) or "").lower()
     parts = [a, b] + ([c] if c else [])
     if unit:
-        factor = {"cm": 10, "m": 1000, "mm": 1}[unit]
-        nums = [_scale(p, factor) for p in parts]
-        # compact, lowercase x, unit attached to the last number: "1300x690x640mm"
-        return "x".join(nums[:-1] + [nums[-1] + "mm"])
+        if scale_mm:
+            # required Product/Packaging dimension fields: scale cm/m to mm
+            factor = {"cm": 10, "m": 1000, "mm": 1}[unit]
+            nums = [_scale(p, factor) for p in parts]
+            return "x".join(nums[:-1] + [nums[-1] + "mm"])
+        # every other dimension field (GPU length, monitor physical dims): keep the
+        # field's native unit, only compact — never scale to mm (schema is cm-native).
+        nums = [str(_num(p)) for p in parts]
+        return "x".join(nums) + unit
     # no unit (e.g. a resolution "1920 x 1080"): compact the separators only,
     # never scale and never assert mm. The unitless-dimension flag still fires.
     return "x".join(str(_num(p)) for p in parts)
@@ -203,15 +215,20 @@ def standardise_value(header, value):
             notes.append("UK spelling"); out = new
         return out, notes
     out, notes = value, []
+    scale_mm = bool(_SCALE_DIM.search(header))   # only required dimension fields scale to mm
     new = _ascii_safe(out)
     if new != out:
         notes.append("charset"); out = new
-    new = _DIM.sub(_norm_dim, out)
+    new = _DIM.sub(lambda m: _norm_dim(m, scale_mm), out)
     if new != out:
         notes.append("dimension format/unit"); out = new
     new = _LEN_ONE.sub(_norm_len_one, out)
     if new != out:
         notes.append("unit spacing"); out = new
+    if _CONTRAST.search(header):
+        new = _THOUSANDS.sub("", out)
+        if new != out:
+            notes.append("contrast ratio commas"); out = new
     new = _UNIT_COMPACT.sub(lambda m: f"{m.group(1)}{m.group(2)}", out)
     if new != out:
         notes.append("measurement compacted"); out = new
