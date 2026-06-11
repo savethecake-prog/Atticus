@@ -151,14 +151,19 @@ def test_audit_schema_conformance():
     schema = {"tabs": {"GPUs": {"roles": {"title": 1, "spec_start": 2, "spec_end": 2, "sku": 3},
                                 "labels": {}, "header_row": 1, "first_data_row": 2, "example_rows": []}}}
     ledger.save("/tmp/th/leds.json", [])
+    import hashlib
+    before_hash = hashlib.md5(open("/tmp/th/wbs.xlsx", "rb").read()).hexdigest()
     findings = audit.audit("/tmp/th/wbs.xlsx", schema, "/tmp/th/leds.json", "/tmp/th/reps.md", profiles={})
     check("audit: schema single-select violation surfaced as SCHEMA finding",
           any(sev == "SCHEMA" and "single_select" in m for *_, sev, m in
               [(f[0], f[1], f[2], f[3], f[4]) for f in findings]))
-    # the auditor flags but never edits the value (the writer fixes)
-    from openpyxl import load_workbook as _lw
-    check("audit: schema violation value left intact (auditor never rewrites)",
-          _lw("/tmp/th/wbs.xlsx")["GPUs"].cell(2, 2).value == "Maybe")
+    # the tester never writes the work: the SOURCE workbook is byte-for-byte
+    # unmodified; annotations go to a separate *_audited.xlsx copy.
+    import hashlib
+    after = hashlib.md5(open("/tmp/th/wbs.xlsx", "rb").read()).hexdigest()
+    check("audit: source workbook left byte-for-byte (annotations to a copy)",
+          after == before_hash)
+    check("audit: separate annotated copy written", os.path.exists("/tmp/th/wbs_audited.xlsx"))
 
 
 def test_jobspec():
@@ -684,6 +689,17 @@ def test_standardise_style():
     check("style: capacity compacted", f("Memory capacity:", "16 GB") == "16GB")
     check("style: natural language not compacted",
           f("Front camera:", "8 megapixel") == "8 megapixel")
+    # per-field units (Stage 4): only required dimension fields scale to mm;
+    # cm-native fields keep cm and only compact.
+    check("style: GPU length keeps cm, compacted", f("GPU Length:", "30.4 cm") == "30.4cm")
+    check("style: monitor physical dims keep cm (not scaled to mm)",
+          f("Dimension with stand (W×H×D):", "53.9 × 42.2 × 21.7 cm") == "53.9x42.2x21.7cm")
+    check("style: required product dims still scale cm->mm",
+          f("Product dimensions:", "5 × 6 × 7 cm") == "50x60x70mm")
+    # per-field comma policy (Stage 4): contrast ratio drops thousands separators,
+    # storage speeds keep theirs.
+    check("style: contrast ratio commas stripped", f("Contrast ratio (Typical):", "1,000:1") == "1000:1")
+    check("style: storage speed keeps its comma", f("Storage Read speed:", "1,600MB/s") == "1,600MB/s")
     check("style: angle range spelled out, + dropped",
           f("Backrest incline:", "100° to 125°") == "100 to 125 degrees")
     check("style: signed angle range, + dropped, - kept",

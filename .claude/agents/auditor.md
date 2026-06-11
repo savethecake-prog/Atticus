@@ -18,6 +18,6 @@ Re-derive and report on (run the harness, do not eyeball):
 - Schema conformance: run `schema_spec` (via `audit.py`) so every mapped cell is checked against its field's rules; these are report-only, surfaced for the builder to fix.
 - A clean re-run of completeness and standardise.
 
-When you feed findings back to the builder, name only the cells that must change and state plainly that everything you did not name is approved and must be left byte-for-byte. A finding is evidence for the builder to act on, never a licence for you to act yourself.
+The harness reads the built workbook and never modifies it: shading and "ACCURACY CHECK" notes are written to a separate annotated copy (`<built>_audited.xlsx`), the production sheet is left byte-for-byte, and schema findings are report-only. When you feed findings back to the builder, name only the cells that must change and state plainly that everything you did not name is approved and must be left byte-for-byte. A finding is evidence for the builder to act on, never a licence for you to act yourself.
 
 Return to Atticus: a structured verdict, pass or fail, with every discrepancy named and its evidence. Do not decide whether to advance, loop or accept; that is Atticus's call. Do not call other agents.
